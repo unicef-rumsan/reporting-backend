@@ -49,6 +49,7 @@
     "@hapi/inert": "^6.0.2",
     "@hapi/vision": "^6.0.1",
     "@rumsan/core": "^1.0.601",
+    "axios": "^0.27.2",
     "config": "^3.3.1",
     "cross-env": "^7.0.2",
     "dotenv": "^16.0.1",

@@ -7,6 +7,7 @@ const HapiSwagger = require("hapi-swagger");
 const Logger = require("./helpers/logger");
 const WSService = require("@rumsan/core/services/webSocket");
 const app = require("./app");
+const contractListener = require("./modules/_listeners/contractListeners");
 
 const { username, password, database } = config.get("db");
 const SequelizeDB = require("@rumsan/core").SequelizeDB;
@@ -173,6 +174,7 @@ SequelizeDB.db
     await start();
     await require("@rumsan/core/appSettings").init(SequelizeDB.db);
     console.log("Database connected...");
+    contractListener.listen();
   })
   .catch((err) => {
     console.log("Error: " + err);

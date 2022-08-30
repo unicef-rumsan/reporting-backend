@@ -1,0 +1,80 @@
+{
+  "name": "rumsan-backend-seed",
+  "version": "1.0.0",
+  "description": "Rumsan Backend seed",
+  "main": "./index.js",
+  "scripts": {
+    "lint": "eslint .",
+    "lintfix": "eslint --fix .",
+    "pretty": "prettier --write **/*.js",
+    "start": "cross-env ENV_TYPE=development nodemon .",
+    "production": "ENV_TYPE=production node .",
+    "setup": "yarn install",
+    "migrate:create": "npx sequelize-cli db:create",
+    "migrate:up": "npx sequelize-cli db:migrate",
+    "migrate:undo": "npx sequelize-cli db:migrate:undo",
+    "test": "cross-env NODE_ENV=development jest --runInBand --detectOpenHandles ./tests",
+    "test:watch": "cross-env NODE_ENV=development jest --runInBand --detectOpenHandles --watch ./tests"
+  },
+  "author": {
+    "email": "team@rumsan.com",
+    "name": "Rumsan Team"
+  },
+  "maintainers": [
+    {
+      "email": "team@rumsan.com",
+      "name": "Rumsan Team"
+    }
+  ],
+  "license": "TBD",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "nodemonConfig": {
+    "watch": [
+      "websocket",
+      "helpers",
+      "modules",
+      "app.js",
+      "play/*",
+      "../rslib/packages"
+    ],
+    "ignore": [
+      "public/*"
+    ]
+  },
+  "dependencies": {
+    "@hapi/hapi": "^20.0.0",
+    "@hapi/inert": "^6.0.2",
+    "@hapi/vision": "^6.0.1",
+    "@rumsan/core": "^1.0.601",
+    "config": "^3.3.1",
+    "cross-env": "^7.0.2",
+    "dotenv": "^16.0.1",
+    "ethers": "^5.6.9",
+    "hapi-swagger": "^14.0.0",
+    "hapi-swagger-static": "^2.0.13",
+    "joi": "^17.6.0",
+    "jsonwebtoken": "^8.5.1",
+    "nodemailer": "^6.7.8",
+    "pg": "^8.8.0",
+    "pg-hstore": "^2.3.4",
+    "pino": "^8.1.0",
+    "pino-pretty": "^8.1.0",
+    "qs-stringify": "^1.2.1",
+    "sequelize": "^6.21.4"
+  },
+  "devDependencies": {
+    "eslint": "^7.7.0",
+    "eslint-config-airbnb-base": "^14.2.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-jest": "^24.0.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "jest": "^28.1.1",
+    "prettier": "^2.1.1",
+    "prettier-plugin-solidity": "^1.0.0-alpha.57",
+    "sequelize-cli": "^6.4.1"
+  }
+}

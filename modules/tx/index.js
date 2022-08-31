@@ -1,10 +1,12 @@
-const Validator = require("./tag.validators");
-const Controller = require("./tag.controller");
+const Validator = require("./tx.validators");
+const Controller = require("./tx.controllers");
 const { AbstractRouter } = require("@rumsan/core/abstract");
-const { db } = require("@rumsan/core").SequelizeDB;
+const { EVENTS } = require("../../constants/appConstants");
+
 module.exports = class extends AbstractRouter {
   constructor(options = {}) {
-    options.name = options.name || "tags";
+    options.name = options.name || "transactions";
+    options.listeners = {};
     options.controller = new Controller(options);
     options.validator = new Validator(options);
     super(options);
@@ -13,12 +15,12 @@ module.exports = class extends AbstractRouter {
     add: {
       method: "POST",
       path: "",
-      description: "Add new Tag",
+      description: "Add new Transaction",
     },
     list: {
       method: "GET",
       path: "",
-      description: "List all Tags",
+      description: "List all Transactions",
       //permissions: ["note_read"],
     },
   };

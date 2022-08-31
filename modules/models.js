@@ -1,10 +1,7 @@
-require("@rumsan/user").initModels();
-const UserModel = require("./user/user.model");
-const TagModel = require("./tag/tag.model");
+const TransactionModel = require("./tx/tx.model");
 
 let modelFactory = {
-  TagModel: new TagModel().init(),
-  UserModel: new UserModel().init(),
+  TransactionModel: new TransactionModel().init(),
 };
 
 /**********************************************************

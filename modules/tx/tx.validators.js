@@ -3,9 +3,7 @@ const { AbstractValidator } = require("@rumsan/core/abstract");
 
 const validators = {
   add: {
-    payload: Joi.object({
-      title: Joi.string().required().error(new Error("Invalid title")),
-    }),
+    payload: Joi.object({}),
   },
 };
 

@@ -1,10 +1,10 @@
-const Validator = require("./tx.validators");
-const Controller = require("./tx.controllers");
+const Validator = require("./beneficiary.validators");
+const Controller = require("./beneficiary.controller");
 const { AbstractRouter } = require("@rumsan/core/abstract");
 
 module.exports = class extends AbstractRouter {
   constructor(options = {}) {
-    options.name = options.name || "transactions";
+    options.name = options.name || "beneficiaries";
     options.listeners = {};
     options.controller = new Controller(options);
     options.validator = new Validator(options);
@@ -14,13 +14,18 @@ module.exports = class extends AbstractRouter {
     add: {
       method: "POST",
       path: "",
-      description: "Add new Transaction",
+      description: "Add new Beneficiary",
     },
     list: {
       method: "GET",
       path: "",
-      description: "List all Transactions",
+      description: "List all Beneficiary",
       //permissions: ["note_read"],
+    },
+    getById: {
+      method: "GET",
+      path: "/{id}",
+      description: "Get Beneficiary by id",
     },
   };
 };

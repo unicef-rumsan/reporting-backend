@@ -7,7 +7,7 @@ const HapiSwagger = require("hapi-swagger");
 const Logger = require("./helpers/logger");
 const WSService = require("@rumsan/core/services/webSocket");
 const app = require("./app");
-const contractListener = require("./modules/_listeners/contractListeners");
+const ContractListener = require("./modules/_listeners/contractListeners");
 
 const { username, password, database } = config.get("db");
 const SequelizeDB = require("@rumsan/core").SequelizeDB;
@@ -32,7 +32,7 @@ const server = new Hapi.Server({
       additionalHeaders: [
         "cache-control",
         "x-requested-with",
-        "access_token",
+        "accessToken",
         "auth_signature",
         "data_signature",
         "h-captcha-response",
@@ -174,7 +174,7 @@ SequelizeDB.db
     await start();
     await require("@rumsan/core/appSettings").init(SequelizeDB.db);
     console.log("Database connected...");
-    contractListener.listen();
+    ContractListener.listen();
   })
   .catch((err) => {
     console.log("Error: " + err);

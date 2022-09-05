@@ -1,13 +1,15 @@
 const config = require("config");
 const ethers = require("ethers");
 const axios = require("axios");
-
 const rahatServer = config.get("services.rahat");
 const websocketProvider = config.get("services.blockchain.webSocketProvider");
 
+var EventEmitter = require("events");
+const { EVENTS } = require("../../constants/appConstants");
+
 const provider = new ethers.providers.WebSocketProvider(websocketProvider);
 
-module.exports = {
+class ContractListener extends EventEmitter {
   /**
    * Get contract information from Rahat server
    */
@@ -17,7 +19,7 @@ module.exports = {
     res = await axios(`${rahatServer}/api/v1/app/settings`);
     const contractAddress = res.data.agency.contracts.rahat;
     return new ethers.Contract(contractAddress, abi, provider);
-  },
+  }
 
   /**
    * Create SHA3 hash of OTP.
@@ -25,7 +27,7 @@ module.exports = {
    */
   generateHash(payload) {
     return ethers.utils.keccak256(ethers.utils.toUtf8Bytes(payload));
-  },
+  }
   /**
    * Listen to blockchain events
    */
@@ -33,13 +35,15 @@ module.exports = {
     const contract = await this.getContract();
     contract.on("ClaimAcquiredERC20", async (vendor, phone, amount, log) => {
       try {
-        console.log({
+        const data = {
           blockNumber: log.blockNumber,
           txHash: log.transactionHash,
           vendor,
           phone: phone.toNumber(),
           amount: amount.toNumber(),
-        });
+        };
+
+        this.emit(EVENTS.TRANSACTION_ADDED, data);
       } catch (e) {
         console.log(e);
       }
@@ -57,8 +61,10 @@ module.exports = {
     });
 
     console.log("----------------------------------------");
-    console.log(`Coontract: ${contract.address}`);
+    console.log(`Contract: ${contract.address}`);
     console.log("> Listening to events...");
     console.log("----------------------------------------");
-  },
-};
+  }
+}
+
+module.exports = new ContractListener();

@@ -53,7 +53,7 @@
     "config": "^3.3.1",
     "cross-env": "^7.0.2",
     "dotenv": "^16.0.1",
-    "ethers": "^5.6.9",
+    "ethers": "^5.7.0",
     "hapi-swagger": "^14.0.0",
     "hapi-swagger-static": "^2.0.13",
     "joi": "^17.6.0",

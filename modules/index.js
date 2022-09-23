@@ -4,6 +4,8 @@ const { AppSettings } = require("@rumsan/core");
 const _Transactions = require("./tx");
 const ContractListener = require("./_listeners/contractListeners");
 const _Beneficiaries = require("./beneficiary");
+const _Vendors = require("./vendor");
+const _Projects = require("./project");
 
 //const Tag = require("./tag");
 const { mailOtp } = require("./eventHandlers");
@@ -13,6 +15,8 @@ let Routes = {
   AppSettings: AppSettings.Router(),
   Transactions: new _Transactions(),
   Beneficiaries: new _Beneficiaries(),
+  Vendors: new _Vendors(),
+  Projects: new _Projects(),
 };
 
 ContractListener.on(EVENTS.TRANSACTION_ADDED, (data) => {

@@ -1,13 +1,13 @@
 const { AbstractController } = require("@rumsan/core/abstract");
 const WSService = require("@rumsan/core/services/webSocket");
 const checkToken = require("../../helpers/utils/checkToken");
-const { BeneficiaryModel } = require("../models");
+const { ProjectModel } = require("../models");
 
 module.exports = class extends AbstractController {
   constructor(options) {
     super(options);
     options.listeners = {};
-    this.table = BeneficiaryModel;
+    this.table = ProjectModel;
   }
 
   registrations = {

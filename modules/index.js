@@ -23,4 +23,8 @@ ContractListener.on(EVENTS.TRANSACTION_ADDED, (data) => {
   Routes.Transactions._controllers.add(data);
 });
 
+ContractListener.getLogsFromExplorer().then(async (data) => {
+  await Routes.Transactions._controllers._bulkAdd(data);
+});
+
 module.exports = Routes;

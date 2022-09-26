@@ -57,6 +57,7 @@ const projectsMapping = (list) =>
 //   DROP TABLE IF EXISTS "tblTxs";
 // DROP TABLE IF EXISTS "tblAppSettings";
 const dropTables = `
+  DROP TABLE IF EXISTS "tblTxs";
   DROP TABLE IF EXISTS "tblBeneficiaries";
   DROP TABLE IF EXISTS "tblVendors";
   DROP TABLE IF EXISTS "tblProjects";

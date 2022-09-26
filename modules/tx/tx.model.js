@@ -24,6 +24,22 @@ const schema = {
     type: Sequelize.STRING,
     allowNull: false,
   },
+  ward: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+  timestamp: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
+  method: {
+    type: Sequelize.ENUM("sms", "qr"),
+    allowNull: false,
+  },
+  mode: {
+    type: Sequelize.ENUM("online", "offline"),
+    allowNull: false,
+  },
 };
 
 module.exports = class extends AbstractModel {

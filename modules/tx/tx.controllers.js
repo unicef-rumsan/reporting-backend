@@ -31,13 +31,13 @@ module.exports = class extends AbstractController {
 
       transaction = JSON.parse(JSON.stringify(transaction));
 
-      WSService.broadcast(
-        {
-          ...transaction,
-          name: beneficiaries.name,
-        },
-        "rahat_claimed"
-      );
+      // WSService.broadcast(
+      //   {
+      //     ...transaction,
+      //     name: beneficiaries.name,
+      //   },
+      //   "rahat_claimed"
+      // );
     } catch (err) {
       console.log(err);
     }
@@ -66,31 +66,30 @@ module.exports = class extends AbstractController {
   async list() {
     const list = await this.table.findAll({
       raw: true,
-      order: [["createdAt", "DESC"]],
+      order: [["timestamp", "DESC"]],
       limit: 10,
     });
 
-    // const phonesList = list.map((item) => item.phone);
-    // const beneficiaryList = await this.tblBeneficiaries.findAll({
-    //   where: {
-    //     phone: {
-    //       [Op.in]: phonesList,
-    //     },
-    //   },
-    //   raw: true,
-    // });
-    // console.log("beneficiaryList", beneficiaryList);
-    // const beneficiaryMapped = list
-    //   .map((list) =>
-    //     beneficiaryList.map((benef) => {
-    //       return {
-    //         name: benef.name,
-    //         ...list,
-    //       };
-    //     })
-    //   )
-    //   .flatMap((e) => e);
-    return list;
+    const phonesList = list.map((item) => item.phone);
+    const beneficiaryList = await this.tblBeneficiaries.findAll({
+      where: {
+        phone: {
+          [Op.in]: phonesList,
+        },
+      },
+      raw: true,
+    });
+
+    const beneficiaryMapped = list
+      .map((list) =>
+        beneficiaryList.map((benef) => {
+          return {
+            name: benef.name,
+            ...list,
+          };
+        })
+      )
+      .flatMap((e) => e);
     return beneficiaryMapped;
   }
 };

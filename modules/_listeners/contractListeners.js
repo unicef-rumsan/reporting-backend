@@ -46,7 +46,7 @@ class ContractListener extends EventEmitter {
   async getLogsFromExplorer() {
     let abi = await this.getAbi("Rahat");
     let { data } = await axios.get(
-      "https://explorer.rumsan.com/api?module=logs&action=getLogs&fromBlock=16112707&toBlock=latest&address=0x67749B69cc2e5b146fd140A21f9De2Ac61d8d47F&topic0=0xe4de809bf00bba73c562150b76ba81e5af05183458342bfdb09a7c9e303813e5"
+      "https://explorer.rumsan.com/api?module=logs&action=getLogs&fromBlock=16112000&toBlock=latest&address=0x67749B69cc2e5b146fd140A21f9De2Ac61d8d47F&topic0=0xe4de809bf00bba73c562150b76ba81e5af05183458342bfdb09a7c9e303813e5"
     );
     const iface = new ethers.utils.Interface(abi);
 
@@ -60,7 +60,7 @@ class ContractListener extends EventEmitter {
       const data = {
         blockNumber: d.blockNumber,
         txHash: d.transactionHash,
-        timestamp: d.timeStamp,
+        timestamp: new Date(parseInt(d.timeStamp) * 1000),
         vendor: log.args.vendor,
         phone: log.args[1]?.toNumber(),
         amount: log.args.amount?.toNumber(),
@@ -68,7 +68,6 @@ class ContractListener extends EventEmitter {
         mode: "online",
         method: "qr",
       };
-
       return data;
     });
     return logData;

@@ -3,6 +3,7 @@ const { EVENTS } = require("../../constants/appConstants");
 const WSService = require("@rumsan/core/services/webSocket");
 const { TransactionModel, BeneficiaryModel } = require("../models");
 const { Op } = require("sequelize");
+const getDifferentObject = require("../../helpers/utils/getDifferentObject");
 
 module.exports = class extends AbstractController {
   constructor(options) {
@@ -30,13 +31,33 @@ module.exports = class extends AbstractController {
 
       transaction = JSON.parse(JSON.stringify(transaction));
 
-      WSService.broadcast(
-        {
-          ...transaction,
-          name: beneficiaries.name,
-        },
-        "rahat_claimed"
-      );
+      // WSService.broadcast(
+      //   {
+      //     ...transaction,
+      //     name: beneficiaries.name,
+      //   },
+      //   "rahat_claimed"
+      // );
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  async _bulkAdd(payload) {
+    try {
+      const transactionsList = await this.table.findAll({
+        order: [["createdAt", "DESC"]],
+      });
+      const filtered = getDifferentObject(payload, transactionsList, "txHash");
+
+      if (filtered.length === 0 || !filtered.length) {
+        return "No new transactions";
+      } else {
+        const saved = await this.table.bulkCreate(filtered);
+
+        WSService.broadcast(filtered, "rahat_claimed");
+        return saved;
+      }
     } catch (err) {
       console.log(err);
     }
@@ -45,7 +66,7 @@ module.exports = class extends AbstractController {
   async list() {
     const list = await this.table.findAll({
       raw: true,
-      order: [["createdAt", "DESC"]],
+      order: [["timestamp", "DESC"]],
       limit: 10,
     });
 
@@ -58,6 +79,7 @@ module.exports = class extends AbstractController {
       },
       raw: true,
     });
+
     const beneficiaryMapped = list
       .map((list) =>
         beneficiaryList.map((benef) => {
@@ -68,7 +90,6 @@ module.exports = class extends AbstractController {
         })
       )
       .flatMap((e) => e);
-
     return beneficiaryMapped;
   }
 };

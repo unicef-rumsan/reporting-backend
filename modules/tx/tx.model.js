@@ -24,6 +24,30 @@ const schema = {
     type: Sequelize.STRING,
     allowNull: false,
   },
+
+  ward: {
+    type: Sequelize.INTEGER,
+    allowNull: false,
+  },
+  timestamp: {
+    type: Sequelize.STRING,
+    allowNull: false,
+    set(v) {
+      this.setDataValue("timestamp", v.toISOString());
+      this.setDataValue("year", new Date(v).getFullYear());
+    },
+  },
+  year: {
+    type: Sequelize.STRING,
+  },
+  method: {
+    type: Sequelize.ENUM("sms", "qr"),
+    allowNull: false,
+  },
+  mode: {
+    type: Sequelize.ENUM("online", "offline"),
+    allowNull: false,
+  },
 };
 
 module.exports = class extends AbstractModel {

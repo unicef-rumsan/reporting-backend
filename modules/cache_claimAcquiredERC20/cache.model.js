@@ -24,16 +24,14 @@ const schema = {
     type: Sequelize.STRING,
     allowNull: false,
   },
-
   ward: {
     type: Sequelize.INTEGER,
-    allowNull: false,
+    defaultValue: 0,
   },
   timestamp: {
-    type: Sequelize.STRING,
-    allowNull: false,
+    type: "TIMESTAMP",
     set(v) {
-      this.setDataValue("timestamp", v.toISOString());
+      // this.setDataValue("timestamp", v.toISOString());
       this.setDataValue("year", new Date(v).getFullYear());
     },
   },
@@ -41,18 +39,18 @@ const schema = {
     type: Sequelize.STRING,
   },
   method: {
-    type: Sequelize.ENUM("sms", "qr"),
-    allowNull: false,
+    type: Sequelize.ENUM("sms", "qr", "unavailable"),
+    defaultValue: "unavailable",
   },
   mode: {
-    type: Sequelize.ENUM("online", "offline"),
-    allowNull: false,
+    type: Sequelize.ENUM("online", "offline", "unavailable"),
+    defaultValue: "unavailable",
   },
 };
 
 module.exports = class extends AbstractModel {
   schema = schema;
   constructor() {
-    super({ tableName: "tblTxs" });
+    super({ tableName: "tblCache_ClaimAcquiredERC20" });
   }
 };

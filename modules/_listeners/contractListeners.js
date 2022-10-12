@@ -1,8 +1,5 @@
 const conf = require("config");
-const config = {
-  serverUrl: "https://unicef-api.np.rahat.io/api/v1",
-  explorerUrl: "",
-};
+
 const ethers = require("ethers");
 const axios = require("axios");
 const rahatServer = conf.get("services.rahat");
@@ -14,76 +11,6 @@ const { EVENTS } = require("../../constants/appConstants");
 const provider = new ethers.providers.WebSocketProvider(websocketProvider);
 
 class ContractListener extends EventEmitter {
-  async getSettings() {
-    const {
-      data: {
-        agency: { contracts },
-        networkUrl,
-      },
-    } = await axios.get(`${config.serverUrl}/app/settings`);
-    return { contracts, networkUrl };
-  }
-  async getAbi(contractName) {
-    const {
-      data: { abi },
-    } = await axios.get(`${config.serverUrl}/app/contracts/${contractName}`);
-    return abi;
-  }
-
-  async getProvider() {
-    const { networkUrl } = await this.getSettings();
-    return new ethers.providers.JsonRpcProvider(networkUrl);
-  }
-
-  async getRahatContract(wallet) {
-    const abi = await this.getAbi("Rahat");
-    const { contracts, networkUrl } = await this.getSettings();
-    const provider = new ethers.providers.JsonRpcProvider(networkUrl);
-    if (!wallet) return new ethers.Contract(contracts.rahat, abi, provider);
-    return new ethers.Contract(contracts.rahat, abi, wallet);
-  }
-
-  async getLogsFromExplorer() {
-    let abi = await this.getAbi("Rahat");
-    let { data } = await axios.get(
-      "https://explorer.rumsan.com/api?module=logs&action=getLogs&fromBlock=16112000&toBlock=latest&address=0x67749B69cc2e5b146fd140A21f9De2Ac61d8d47F&topic0=0xe4de809bf00bba73c562150b76ba81e5af05183458342bfdb09a7c9e303813e5"
-    );
-    const iface = new ethers.utils.Interface(abi);
-
-    const logData = data.result.map((d) => {
-      const topics = d.topics.filter((d) => d !== null);
-      let log = iface.parseLog({
-        data: d.data,
-        topics,
-      });
-
-      const data = {
-        blockNumber: d.blockNumber,
-        txHash: d.transactionHash,
-        timestamp: new Date(parseInt(d.timeStamp) * 1000),
-        vendor: log.args.vendor,
-        phone: log.args[1]?.toNumber(),
-        amount: log.args.amount?.toNumber(),
-        ward: "1",
-        mode: "online",
-        method: "qr",
-      };
-      return data;
-    });
-    return logData;
-  }
-
-  async getDataFromLogs() {
-    let rahatContract = await this.getRahatContract();
-    let provider = await this.getProvider();
-
-    const filterTokenReceived = rahatContract.filters.ClaimAcquiredERC20();
-    filterTokenReceived.fromBlock = 16320000;
-    filterTokenReceived.toBlock = "latest";
-    const logs = await provider.getLogs(filterTokenReceived);
-    console.log(logs);
-  }
-
   /**
    * Get contract information from Rahat server
    */

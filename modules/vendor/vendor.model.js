@@ -10,8 +10,8 @@ const schema = {
   name: Sequelize.STRING,
   gender: Sequelize.STRING,
   phone: Sequelize.STRING,
-  wallet_address: Sequelize.STRING,
-  govt_id: Sequelize.STRING,
+  walletAddress: Sequelize.STRING,
+  govtId: Sequelize.STRING,
   agencies: Sequelize.ARRAY(Sequelize.JSON),
 };
 

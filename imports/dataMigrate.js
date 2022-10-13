@@ -9,17 +9,21 @@ SequelizeDB.init(database, username, password, config.get("db"));
 const { db } = SequelizeDB;
 require("../modules/models");
 
+const {
+  reportMigrationUrl: { sourceUrl, reportingUrl },
+} = config;
+
 const sourceApi = axios.create({
-  baseURL: "http://localhost:3601/api/v1",
+  baseURL: sourceUrl.url + "/api/v1",
   headers: {
-    report_token: "token",
+    report_token: sourceUrl.token,
   },
 });
 
 const reportApi = axios.create({
-  baseURL: "http://localhost:4900/api/v1",
+  baseURL: reportingUrl.url + "/api/v1",
   headers: {
-    report_token: "6E4(WdnI5ukyHDaqy-AKEZvT$7JDnrQG",
+    report_token: reportingUrl.token,
   },
 });
 

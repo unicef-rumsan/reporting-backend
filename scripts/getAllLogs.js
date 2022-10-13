@@ -133,16 +133,11 @@ const scripts = {
           ...decoded,
         };
       });
-      // try {
-      //   const save = await axios.post(
-      //     `${urlConfig.reportingUrl}/transactions/add/bulk`,
-      //     mappedData
-      //   );
-      //   console.log("save", save);
-      // } catch (err) {
-      //   console.log("err", err);
-      // }
-      console.log("mappedData", mappedData);
+      const savedBulk = await axios.post(
+        `${urlConfig.reportingUrl}/claimAcquiredERC20Transactions/add/bulk`,
+        mappedData
+      );
+      console.log("Done:", savedBulk.data.data);
       return mappedData;
     } catch (error) {
       console.log(error);
@@ -202,9 +197,7 @@ const scripts = {
         console.log("error", error);
       }
     }
-    console.log(
-      `Missing values for ${trasactionsWithMissingValues.length} transactions updated`
-    );
+    console.log(`Missing values for transactions updated`);
     return "done";
   },
 };

@@ -12,7 +12,7 @@ module.exports = class extends AbstractController {
 
   registrations = {
     add: (req) => this.add(req.payload, req),
-    list: (req) => this.list(_, req),
+    list: (req) => this.list(req.query, req),
     getById: (req) => this.getById(req.params.id, req),
     bulkAdd: (req) => this.bulkAdd(req.payload, req),
     getBeneficiaryCountByGroup: (req) => this.getBeneficiaryCountByGroup(),
@@ -20,7 +20,7 @@ module.exports = class extends AbstractController {
   };
 
   async add(payload, req) {
-    checkToken(req);
+    // checkToken(req);
     try {
       return this.table.create(payload);
     } catch (err) {
@@ -29,7 +29,7 @@ module.exports = class extends AbstractController {
   }
 
   async bulkAdd(payload, req) {
-    checkToken(req);
+    // checkToken(req);
     try {
       return this.table.bulkCreate(payload);
     } catch (err) {
@@ -37,8 +37,8 @@ module.exports = class extends AbstractController {
     }
   }
 
-  async list(_, req) {
-    checkToken(req);
+  async list(a, req) {
+    // checkToken(req);
     const list = await this.table.findAll({});
     return list;
   }

@@ -1,13 +1,16 @@
 const { AbstractController } = require("@rumsan/core/abstract");
 const { Op } = require("sequelize");
-const { BeneficiaryModel, TransactionModel } = require("../models");
+const {
+  BeneficiaryModel,
+  TransactionClaimERCCacheModel,
+} = require("../models");
 
 module.exports = class extends AbstractController {
   constructor(options) {
     super(options);
     options.listeners = {};
     this.tblBeneficiaries = BeneficiaryModel;
-    this.tblTxs = TransactionModel;
+    this.tblTxs = TransactionClaimERCCacheModel;
   }
 
   registrations = {

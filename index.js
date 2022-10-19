@@ -36,6 +36,7 @@ const server = new Hapi.Server({
         "auth_signature",
         "data_signature",
         "h-captcha-response",
+        "projectId",
       ],
     },
     files: {
@@ -68,7 +69,7 @@ WSService.init({
 
 const swaggerOptions = {
   info: {
-    title: "Rumsan API Service",
+    title: "Rahat Reporting API Service",
     version: process.env.npm_package_version,
     description: process.env.npm_package_description,
   },

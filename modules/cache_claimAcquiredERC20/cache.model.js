@@ -20,6 +20,9 @@ const schema = {
     type: Sequelize.INTEGER,
     allowNull: false,
   },
+  beneficiary: {
+    type: Sequelize.STRING,
+  },
   phone: {
     type: Sequelize.STRING,
     allowNull: false,
@@ -29,7 +32,8 @@ const schema = {
     defaultValue: 0,
   },
   timestamp: {
-    type: "TIMESTAMP",
+    type: Sequelize.DATE,
+    // allowNull: false,
     set(v) {
       // this.setDataValue("timestamp", v.toISOString());
       this.setDataValue("year", new Date(v).getFullYear());

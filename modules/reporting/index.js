@@ -19,6 +19,16 @@ module.exports = class extends AbstractRouter {
       path: "/beneficiary/count-by-gender",
       description: "Get Beneficiary count by gender",
     },
+    getBeneficiariesCounts: {
+      method: "GET",
+      path: "/beneficiary/counts",
+      description: "Get Impacted Beneficiaries",
+    },
+    getBeneficiaryGroupingData: {
+      method: "GET",
+      path: "/beneficiary/grouping-data",
+      description: "Get Impacted Beneficiaries",
+    },
 
     // transactions
     getTransactionsCountByMethod: {

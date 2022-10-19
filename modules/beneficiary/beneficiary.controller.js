@@ -1,6 +1,7 @@
 const { AbstractController } = require("@rumsan/core/abstract");
 const WSService = require("@rumsan/core/services/webSocket");
 const checkToken = require("../../helpers/utils/checkToken");
+const { finderByProjectId } = require("../../helpers/utils/projectFinder");
 const { BeneficiaryModel } = require("../models");
 
 module.exports = class extends AbstractController {
@@ -39,7 +40,8 @@ module.exports = class extends AbstractController {
 
   async list(a, req) {
     // checkToken(req);
-    const list = await this.table.findAll({});
+    const list = await finderByProjectId(this.table, a, req);
+    // const list = await this.table.findAll({});
     return list;
   }
 

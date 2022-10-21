@@ -9,7 +9,7 @@ const urlConfig = {
 const axios = require("axios");
 const ethers = require("ethers");
 
-const START_BLOCK = 16112707;
+const START_BLOCK = 16320000;
 
 const scripts = {
   async getAddresses() {
@@ -52,7 +52,9 @@ const scripts = {
 
   async getLogsFromExplorer() {
     console.log("----------------------------------------");
-    console.log("> Getting Transactions from explorer...");
+    console.log(
+      `> Getting Transactions from explorer "${urlConfig.explorerUrl}"...`
+    );
     console.log("----------------------------------------");
 
     let abi = await this.getAbi("Rahat");
@@ -68,17 +70,13 @@ const scripts = {
           data: d.data,
           topics,
         });
-        console.log(
-          "first",
-          d.timeStamp,
-          String(new Date(parseInt(d.timeStamp) * 1000))
-        );
+
         const data = {
           blockNumber: d.blockNumber,
           txHash: d.transactionHash,
           timestamp: new Date(parseInt(d.timeStamp) * 1000),
           vendor: log.args.vendor,
-          phone: log.args[1]?.toNumber(),
+          // phone: log.args[1]?.toNumber(),
           amount: log.args.amount?.toNumber(),
           beneficiary: log.args.beneficiary.toNumber(), //test
         };
@@ -111,12 +109,22 @@ const scripts = {
   },
 
   async getModifiedDecodedLogs() {
-    const rahatContractAddress = await this.getAddresses().rahat;
+    console.log("----------------------------------------");
+    console.log(
+      `> Getting Transactions from "${urlConfig.updatedExplorerUrl}"...`
+    );
+    console.log("----------------------------------------");
+    // const { rahat: rahatContractAddress } = await this.getAddresses();
+    // console.log("rahatContractAddress", rahatContractAddress);
+    let rahatContractAddress = "0x67749B69cc2e5b146fd140A21f9De2Ac61d8d47F";
 
     try {
       const { data } = await axios.get(
-        `${urlConfig.updatedExplorerUrl}?module=logs&action=getLogs&fromBlock=${START_BLOCK}&toBlock=latest&address=${rahatContractAddress}&topic0=0xe4de809bf00bba73c562150b76ba81e5af05183458342bfdb09a7c9e303813e5`
+        `${urlConfig.updatedExplorerUrl}/api?module=logs&action=getLogs&fromBlock=16320000&toBlock=latest&address=0x67749B69cc2e5b146fd140A21f9De2Ac61d8d47F&topic0=ClaimAcquiredERC20(address,uint256,uint256)`
       );
+      // const { data } = await axios.get(
+      //   `${urlConfig.updatedExplorerUrl}/api?module=logs&action=getLogs&fromBlock=${START_BLOCK}&toBlock=latest&address=${rahatContractAddress}&topic0=ClaimAcquiredERC20(address,uint256,uint256)`
+      // );
 
       const mappedData = data?.result.map((log) => {
         const decoded = log.decoded.eventFragment.inputs
@@ -143,14 +151,19 @@ const scripts = {
         `${urlConfig.reportingUrl}/claimAcquiredERC20Transactions/add/bulk`,
         mappedData
       );
-      console.log("Done:", savedBulk.data.data);
-      // return mappedData;
+      console.log("Success:", savedBulk.data);
+      return mappedData;
     } catch (error) {
       console.log(error);
     }
   },
 
   async getModifiedTransactionLogs() {
+    console.log("----------------------------------------");
+    console.log(
+      `> Getting Transactions from "${urlConfig.updatedExplorerUrl}"...`
+    );
+    console.log("----------------------------------------");
     try {
       const { data: logData } = await axios.get(
         `${urlConfig.updatedExplorerUrl}/transactions`
@@ -164,11 +177,12 @@ const scripts = {
         { txHashes }
       );
 
-      const mappedData = logData?.map((log) => {
-        const fetchedFromDB = txData.filter((d) => d.txHash === log.txHash)[0];
+      const mappedData = txData.map((tx) => {
+        const log = logData.find((d) => d.txHash === tx.txHash);
+
         return {
-          id: fetchedFromDB?.id,
-          txHash: log.txHash,
+          id: tx?.id,
+          txHash: tx.txHash,
           method: log.extras
             ? log.extras?.isPhone
               ? "sms"
@@ -182,33 +196,44 @@ const scripts = {
           ward: log.extras ? log.extras?.ward : 0,
         };
       });
+
       return mappedData;
     } catch (err) {
       console.log("err", err);
     }
   },
   async updateMissingTransactionValue() {
-    const trasactionsWithMissingValues =
-      await this.getModifiedTransactionLogs();
+    try {
+      const trasactionsWithMissingValues =
+        await this.getModifiedTransactionLogs();
 
-    for (missingTransaction of trasactionsWithMissingValues) {
-      const { id, txHash, ...transaction } = missingTransaction;
-      try {
+      console.log("----------------------------------------");
+      console.log(
+        `Found ${trasactionsWithMissingValues.length} transactions with missing values. 
+
+      Trying to update...`
+      );
+      console.log("----------------------------------------");
+
+      for (missingTransaction of trasactionsWithMissingValues) {
+        const { id, txHash, ...transaction } = missingTransaction;
         await axios.patch(
           `${urlConfig.reportingUrl}/claimAcquiredERC20Transactions/update/${txHash}`,
           transaction
         );
-      } catch (error) {
-        console.log("error", error);
       }
+      console.log(`Missing values for transactions updated`);
+      console.log("----------------------------------------");
+    } catch (error) {
+      console.error(`Error updating missing values for transactions`);
+      console.log("----------------------------------------");
+      console.log("error", error?.response?.data.message);
     }
-    console.log(`Missing values for transactions updated`);
-    return "done";
   },
 };
 
 (async () => {
   await scripts.getLogsFromExplorer();
-  // await scripts.getModifiedDecodedLogs();
+  await scripts.getModifiedDecodedLogs();
   await scripts.updateMissingTransactionValue();
 })();

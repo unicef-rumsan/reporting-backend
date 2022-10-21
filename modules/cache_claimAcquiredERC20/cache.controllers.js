@@ -60,9 +60,11 @@ module.exports = class extends AbstractController {
       if (filtered.length === 0 || !filtered.length) {
         return "No new transactions";
       } else {
+        console.log("filtered", filtered);
         let saved = await this.table.bulkCreate(filtered);
 
         saved = JSON.parse(JSON.stringify(saved));
+        console.log("saved", saved);
         // saved = await this._replaceWithBeneficiaryName(saved);
 
         WSService.broadcast(saved, "rahat_claimed");
@@ -74,26 +76,23 @@ module.exports = class extends AbstractController {
   }
 
   async _replaceWithBeneficiaryName(list) {
-    const phonesList = list.map((item) => item.phone);
+    const phonesList = list.map((item) => item.beneficiary);
     const beneficiaryList = await this.tblBeneficiaries.findAll({
       where: {
         phone: {
           [Op.in]: phonesList,
         },
       },
+      attributes: ["name", "phone"],
       raw: true,
     });
-
-    const beneficiaryMapped = list
-      .map((list) =>
-        beneficiaryList.map((benef) => {
-          return {
-            name: benef.name,
-            ...list,
-          };
-        })
-      )
-      .flatMap((e) => e);
+    const beneficiaryMapped = list.map((item) => {
+      let benef = beneficiaryList.find((b) => b.phone === item.beneficiary);
+      return {
+        ...benef,
+        ...item,
+      };
+    });
 
     return beneficiaryMapped;
   }
@@ -102,12 +101,12 @@ module.exports = class extends AbstractController {
     const list = await this.table.findAll({
       limit: 10,
       raw: true,
-      order: [["timestamp", "DESC"]],
+      order: [["createdAt", "DESC"]],
+      // order: [["timestamp", "DESC"]],
     });
     const beneficiaryMapped = await this._replaceWithBeneficiaryName(list);
-
-    return list;
-    // return beneficiaryMapped;
+    return beneficiaryMapped;
+    // return list;
   }
 
   async listByTxHashes(txHashes) {
@@ -116,17 +115,6 @@ module.exports = class extends AbstractController {
         txHash: {
           [Op.in]: txHashes,
         },
-        [Op.or]: [
-          {
-            mode: "unavailable",
-          },
-          {
-            method: "unavailable",
-          },
-          {
-            ward: 0,
-          },
-        ],
       },
       raw: true,
     });

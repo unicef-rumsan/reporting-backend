@@ -23,16 +23,16 @@ const schema = {
   beneficiary: {
     type: Sequelize.STRING,
   },
-  phone: {
-    type: Sequelize.STRING,
-    allowNull: false,
-  },
+  // phone: {
+  //   type: Sequelize.STRING,
+  //   allowNull: false,
+  // },
   ward: {
     type: Sequelize.INTEGER,
     defaultValue: 0,
   },
   timestamp: {
-    type: Sequelize.DATE,
+    type: "TIMESTAMP",
     // allowNull: false,
     set(v) {
       // this.setDataValue("timestamp", v.toISOString());

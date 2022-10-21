@@ -28,7 +28,6 @@ const reportApi = axios.create({
 });
 
 const beneficiariesMapping = (list) => {
-  console.log("list", list[0]);
   return list.map((item) => ({
     id: item.id,
     name: item.name,
@@ -99,7 +98,6 @@ const script = {
     try {
       const beneficiaries = await sourceApi.get("/reports/beneficiaries");
       const beneficiaryData = beneficiariesMapping(beneficiaries.data);
-      console.log("first", beneficiaryData);
 
       await reportApi.post("/beneficiaries/bulk", beneficiaryData);
 
@@ -146,29 +144,10 @@ const script = {
     // await script.migrateVendors();
     // await script.migrateProjects();
     console.log("Data Migration Completed");
-    process.exit(1);
+    process.exit(0);
   } catch (err) {
     console.log("Data Migration Failed");
-
     console.log(err);
+    process.exit(1);
   }
 })();
-// const run = async () => {
-//   db.authenticate()
-//     .then(async () => {
-//       console.log("Database connected...");
-//       await db.query(dropTables);
-//       await db.sync();
-//       await script.migrateBeneficiary();
-//       await script.migrateVendors();
-//       await script.migrateProjects();
-
-//       console.log("Done");
-//       process.exit(1);
-//     })
-//     .catch((err) => {
-//       console.log("Error: " + err);
-//     });
-// };
-
-// run();

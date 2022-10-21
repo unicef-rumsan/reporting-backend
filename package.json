@@ -14,7 +14,10 @@
     "migrate:up": "npx sequelize-cli db:migrate",
     "migrate:undo": "npx sequelize-cli db:migrate:undo",
     "test": "cross-env NODE_ENV=development jest --runInBand --detectOpenHandles ./tests",
-    "test:watch": "cross-env NODE_ENV=development jest --runInBand --detectOpenHandles --watch ./tests"
+    "test:watch": "cross-env NODE_ENV=development jest --runInBand --detectOpenHandles --watch ./tests",
+    "db:setup": "node ./config/setupDB.js",
+    "data:import": "node ./imports/dataMigrate.js",
+    "transaction:import": "node ./scripts/getAllLogs.js"
   },
   "author": {
     "email": "team@rumsan.com",

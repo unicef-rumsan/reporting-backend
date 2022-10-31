@@ -60,11 +60,9 @@ module.exports = class extends AbstractController {
       if (filtered.length === 0 || !filtered.length) {
         return "No new transactions";
       } else {
-        console.log("filtered", filtered);
         let saved = await this.table.bulkCreate(filtered);
 
         saved = JSON.parse(JSON.stringify(saved));
-        console.log("saved", saved);
         // saved = await this._replaceWithBeneficiaryName(saved);
 
         WSService.broadcast(saved, "rahat_claimed");
@@ -118,7 +116,8 @@ module.exports = class extends AbstractController {
       },
       raw: true,
     });
-    // const beneficiaryMapped = await this._replaceWithBeneficiaryName(list);
+    const beneficiaryMapped = await this._replaceWithBeneficiaryName(list);
+    console.log("first", beneficiaryMapped);
 
     return list;
   }

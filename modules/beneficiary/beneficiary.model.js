@@ -33,6 +33,7 @@ const schema = {
   consentPicture: Sequelize.BOOLEAN,
   bankAccountNumber: Sequelize.STRING,
   mobilizer: Sequelize.STRING,
+  ward: Sequelize.STRING,
 };
 
 module.exports = class extends AbstractModel {

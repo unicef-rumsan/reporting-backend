@@ -69,38 +69,46 @@ module.exports = class extends AbstractController {
     return list;
   }
 
-  async getCountByWard(year) {
-    year = year || new Date().getFullYear();
+  async getCountByWard(year, req) {
+    // year = year || new Date().getFullYear();
     // const list = await finderByProjectId(this.tblTxs)
-    let list = await this.tblTxs.findAll({
-      where: { year },
-      attributes: [
-        "ward",
-        [this.db.Sequelize.fn("COUNT", "ward"), "count"],
-        "year",
-      ],
+    let list = await finderByProjectId(
+      this.tblBeneficiaries,
+      {
+        attributes: [
+          "ward",
+          [this.db.Sequelize.fn("COUNT", "ward"), "count"],
+          // "year",
+        ],
 
-      group: ["ward", "year"],
-    });
+        order: [["ward", "ASC"]],
 
-    const yearList = [
-      ...new Set(
-        JSON.parse(JSON.stringify(await this.tblTxs.findAll({}))).map(
-          (i) => i.year
-        )
-      ),
-    ];
+        group: [
+          "ward",
+          // "year"
+        ],
+      },
+      req
+    );
+
+    // const yearList = [
+    //   ...new Set(
+    //     JSON.parse(JSON.stringify(await this.tblTxs.findAll({}))).map(
+    //       (i) => i.year
+    //     )
+    //   ),
+    // ];
 
     list = JSON.parse(JSON.stringify(list));
 
-    const chartLabel = list.map((item) => item.ward);
-    const chartValues = list.map((item) => item.count);
+    const chartLabel = list.map((item) => item.ward ?? "Unavailable");
+    const chartValues = list.map((item) => +item.count);
     const data = {
-      allAvailableYears: yearList,
+      // allAvailableYears: yearList,
       chartLabel,
       chartData: [
         {
-          year,
+          // year,
           name: "count",
           data: chartValues,
         },
@@ -391,6 +399,35 @@ module.exports = class extends AbstractController {
 
     return list;
   }
+  async _groupByHasPhone(_, req) {
+    let list = await finderByProjectId(
+      this.tblBeneficiaries,
+      {
+        attributes: [
+          "hasPhone",
+          [this.db.Sequelize.fn("COUNT", "hasPhone"), "count"],
+        ],
+        group: ["hasPhone"],
+      },
+      req
+    );
+
+    list = JSON.parse(JSON.stringify(list));
+
+    list = list.map((item) => {
+      return {
+        label:
+          item.hasPhone !== null
+            ? item.hasPhone
+              ? "Yes"
+              : "No"
+            : "Unavailable",
+        value: +item.count,
+      };
+    });
+
+    return list;
+  }
 
   async getBeneficiaryGroupingData(_, req) {
     const ageRange = await this._groupByAgeRange(_, req);
@@ -399,6 +436,7 @@ module.exports = class extends AbstractController {
     const dailyWage = await this._groupByDailyWage(_, req);
     const phoneOwnership = await this._groupByPhoneOwnership(_, req);
     const hasBank = await this._groupByHasBank(_, req);
+    const hasPhone = await this._groupByHasPhone(_, req);
 
     return {
       ageRange,
@@ -407,6 +445,7 @@ module.exports = class extends AbstractController {
       dailyWage,
       phoneOwnership,
       hasBank,
+      hasPhone,
     };
   }
 };

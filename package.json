@@ -17,7 +17,8 @@
     "test:watch": "cross-env NODE_ENV=development jest --runInBand --detectOpenHandles --watch ./tests",
     "db:setup": "node ./config/setupDB.js",
     "data:import": "node ./imports/dataMigrate.js",
-    "transaction:import": "node ./scripts/getAllLogs.js"
+    "transaction:import": "node ./scripts/getAllLogs.js",
+    "setup:app": "yarn db:setup && yarn data:import && yarn transaction:import"
   },
   "author": {
     "email": "team@rumsan.com",

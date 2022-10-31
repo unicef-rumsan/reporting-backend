@@ -209,7 +209,7 @@ const scripts = {
 
       console.log("----------------------------------------");
       console.log(
-        `Found ${trasactionsWithMissingValues.length} transactions with missing values. 
+        `Found ${trasactionsWithMissingValues.length} missing transactions. 
 
       Trying to update...`
       );

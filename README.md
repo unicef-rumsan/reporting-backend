@@ -4,7 +4,13 @@ First install PostgreSQL and create a database named `**from local.json => db.da
 
 - Install pgAdmin 4 and create a server with the same credentials as above.
 
-**Then follow the instructions below in order:**
+**Run the following script to setup automatically**
+
+```bash
+$ yarn setup:app
+```
+
+**Or run the following commands manually in order**
 
 #### 1. Add all the required files inside "config" folder in the root directory of the project.
 

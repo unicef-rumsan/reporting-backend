@@ -41,6 +41,7 @@ const beneficiariesMapping = (list) => {
     walletAddress: item.wallet_address,
     projects: item.projects,
     agency: item.agency,
+    ward: item.extras?.ward,
     familySize: +item.extras?.family_size,
     below5Count: +item.extras?.below5_count,
     below5Male: +item.extras?.below5_male,
@@ -141,8 +142,8 @@ const script = {
   try {
     console.log("Fetching Data from Source...");
     await script.migrateBeneficiary();
-    // await script.migrateVendors();
-    // await script.migrateProjects();
+    await script.migrateVendors();
+    await script.migrateProjects();
     console.log("Data Migration Completed");
     process.exit(0);
   } catch (err) {

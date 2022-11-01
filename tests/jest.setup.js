@@ -17,11 +17,11 @@ DROP TABLE IF EXISTS "tblVendors";
 `;
 
 beforeAll(async () => {
+  // TODO: Match the DB configuration and connections for API as well
+  console.log("Jest setup for Controller");
   await db.authenticate();
-  console.log("Database connected...");
   await db.query(dropTables);
   await db.sync();
-  console.log("DB Setup Complete");
 });
 
 afterAll(async () => {

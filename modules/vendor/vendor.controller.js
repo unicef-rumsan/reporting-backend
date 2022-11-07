@@ -19,7 +19,7 @@ module.exports = class extends AbstractController {
   };
 
   async add(payload, req) {
-    checkToken(req);
+    // checkToken(req);
 
     try {
       return this.table.create(payload);
@@ -29,7 +29,7 @@ module.exports = class extends AbstractController {
   }
 
   async bulkAdd(payload, req) {
-    checkToken(req);
+    // checkToken(req);
 
     try {
       return this.table.bulkCreate(payload);
@@ -39,14 +39,14 @@ module.exports = class extends AbstractController {
   }
 
   async list(_, req) {
-    checkToken(req);
+    // checkToken(req);
 
     const list = await this.table.findAll({});
     return list;
   }
 
   async getById(id, req) {
-    checkToken(req);
+    // checkToken(req);
 
     return this.table.findByPk(id);
   }

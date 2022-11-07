@@ -23,7 +23,9 @@ const validators = {
         .optional()
         .example("5"),
       group: Joi.string().allow("").optional().example("G"),
-      wallet_address: Joi.string().allow("").optional().example("0x00"),
+      walletAddress: Joi.string().allow("").optional().example("0x00"),
+      noOfAdults: Joi.number().integer().allow("").optional().example("5"),
+      noOfChildren: Joi.number().integer().allow("").optional().example("5"),
     }),
   },
   bulkAdd: {
@@ -47,7 +49,9 @@ const validators = {
         .optional()
         .example("5"),
       group: Joi.string().allow("").optional().example("G"),
-      wallet_address: Joi.string().allow("").optional().example("0x00"),
+      walletAddress: Joi.string().allow("").optional().example("0x00"),
+      noOfAdults: Joi.number().integer().allow("").optional().example("5"),
+      noOfChildren: Joi.number().integer().allow("").optional().example("5"),
     }),
   },
 

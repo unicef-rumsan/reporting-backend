@@ -29,6 +29,12 @@ const validators = {
       mode: Joi.string().valid("online", "offline"),
     }),
   },
+  // update: {
+  //   // payload: Joi.object({}),
+  //   params: Joi.object({
+  //     txHash: Joi.string().required(),
+  //   }),
+  // },
 };
 
 module.exports = class extends AbstractValidator {

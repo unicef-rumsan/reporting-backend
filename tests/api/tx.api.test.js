@@ -44,6 +44,7 @@ describe("post/transaction", () => {
     console.log(result);
     // expect(result.ward).toBe(transactionData.ward);
   });
+  
   it("should getById", async () => {
     const token = report_token;
     const resData = await request(URL)

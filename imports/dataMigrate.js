@@ -9,17 +9,21 @@ SequelizeDB.init(database, username, password, config.get("db"));
 const { db } = SequelizeDB;
 require("../modules/models");
 
+const {
+  reportMigrationUrl: { sourceUrl, reportingUrl },
+} = config;
+
 const sourceApi = axios.create({
-  baseURL: "http://localhost:3601/api/v1",
+  baseURL: sourceUrl.url + "/api/v1",
   headers: {
-    report_token: "token",
+    report_token: sourceUrl.token,
   },
 });
 
 const reportApi = axios.create({
-  baseURL: "http://localhost:4900/api/v1",
+  baseURL: reportingUrl.url + "/api/v1",
   headers: {
-    report_token: "6E4(WdnI5ukyHDaqy-AKEZvT$7JDnrQG",
+    report_token: reportingUrl.token,
   },
 });
 
@@ -32,7 +36,9 @@ const beneficiariesMapping = (list) =>
     age: +item.extras.age,
     child: +item.extras.child,
     group: item.extras.group,
-    wallet_address: item.wallet_address,
+    numOfAdults: +item.extras.adult,
+    numOfChildren: +item.extras.child,
+    walletAddress: item.wallet_address,
   }));
 const vendorsMapping = (list) =>
   list.map((item) => ({
@@ -40,19 +46,22 @@ const vendorsMapping = (list) =>
     name: item.name,
     gender: item.gender,
     phone: item.phone,
-    wallet_address: item.wallet_address,
-    govt_id: item.govt_id,
+    walletAddress: item.wallet_address,
+    govtId: item.govt_id,
     agencies: item.agencies,
   }));
 const projectsMapping = (list) =>
-  list.map((item) => ({
-    id: item.id,
-    name: item.name,
-    project_manager: item.project_manager,
-    location: item.location,
-    allocations: item.allocations,
-    financial_institutions: item.financial_institutions,
-  }));
+  list.map((item) => {
+    return {
+      id: item.id,
+      name: item.name,
+      projectManager: item.project_manager,
+      location: item.location,
+      allocations: item.allocations,
+      aidConnectActive: item.aid_connect.isActive,
+      financialInstitutions: item.financial_institutions,
+    };
+  });
 
 //   DROP TABLE IF EXISTS "tblTxs";
 // DROP TABLE IF EXISTS "tblAppSettings";
@@ -79,6 +88,7 @@ const script = {
   async migrateVendors() {
     try {
       const vendors = await sourceApi.get("/reports/vendors");
+
       const vendorData = vendorsMapping(vendors.data);
       await reportApi.post("/vendors/bulk", vendorData);
 
@@ -90,6 +100,7 @@ const script = {
   async migrateProjects() {
     try {
       const projects = await sourceApi.get("/reports/projects");
+
       const projectData = projectsMapping(projects.data);
 
       await reportApi.post("/projects/bulk", projectData);

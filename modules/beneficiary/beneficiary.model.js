@@ -12,8 +12,10 @@ const schema = {
   phone: Sequelize.STRING,
   age: Sequelize.INTEGER,
   child: Sequelize.INTEGER,
+  numOfAdults: Sequelize.INTEGER,
+  numOfChildren: Sequelize.INTEGER,
   group: Sequelize.STRING,
-  wallet_address: Sequelize.STRING,
+  walletAddress: Sequelize.STRING,
 };
 
 module.exports = class extends AbstractModel {

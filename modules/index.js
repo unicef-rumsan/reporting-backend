@@ -22,7 +22,7 @@ let Routes = {
 };
 
 ContractListener.on(EVENTS.TRANSACTION_ADDED, (data) => {
-  Routes.Transactions._controllers.add(data);
+  Routes.TransactionsCacheClaimAcquiredERC20._controllers.add(data);
 });
 
 // ContractListener.on(EVENTS.TRANSACTION_ADDED_EXPLORER_BULK, (data) => {

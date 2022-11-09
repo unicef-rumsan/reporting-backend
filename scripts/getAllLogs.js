@@ -74,7 +74,7 @@ const scripts = {
         const data = {
           blockNumber: d.blockNumber,
           txHash: d.transactionHash,
-          timestamp: new Date(parseInt(d.timeStamp) * 1000),
+          timestamp: parseInt(d.timeStamp),
           vendor: log.args.vendor,
           // phone: log.args[1]?.toNumber(),
           amount: log.args.amount?.toNumber(),

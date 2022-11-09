@@ -32,12 +32,12 @@ const schema = {
     defaultValue: 0,
   },
   timestamp: {
-    type: "TIMESTAMP",
+    type: Sequelize.INTEGER,
     // allowNull: false,
-    set(v) {
-      // this.setDataValue("timestamp", v.toISOString());
-      this.setDataValue("year", new Date(v).getFullYear());
-    },
+    // set(v) {
+    //   // this.setDataValue("timestamp", v.toISOString());
+    //   this.setDataValue("year", new Date(v).getFullYear());
+    // },
   },
   year: {
     type: Sequelize.STRING,

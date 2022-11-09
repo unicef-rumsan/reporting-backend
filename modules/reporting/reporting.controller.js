@@ -101,7 +101,7 @@ module.exports = class extends AbstractController {
 
     list = JSON.parse(JSON.stringify(list));
 
-    const chartLabel = list.map((item) => item.ward ?? "Unavailable");
+    const chartLabel = list.map((item) => `Ward ${item.ward}` ?? "Unavailable");
     const chartValues = list.map((item) => +item.count);
     const data = {
       // allAvailableYears: yearList,
@@ -192,6 +192,70 @@ module.exports = class extends AbstractController {
     };
 
     return data;
+  }
+
+  async _groupByChildrenUnder5(_, req) {
+    let list = await finderByProjectId(
+      this.tblBeneficiaries,
+      {
+        where: {
+          // age: {
+          // [Op.not]: null,
+          // [Op.notIn]: ["u", "undefined", "x", "", null],
+          // },
+        },
+        attributes: [
+          [
+            this.db.Sequelize.literal("COUNT (CASE WHEN age < 0 THEN age END)"),
+            "Under 0",
+          ],
+          [
+            this.db.Sequelize.literal(
+              "COUNT (CASE WHEN age >= 0 AND age <= 1 THEN age END)"
+            ),
+            "Under 2",
+          ],
+          [
+            this.db.Sequelize.literal(
+              "COUNT (CASE WHEN age >= 1 AND age <= 2 THEN age END)"
+            ),
+            "Under 3",
+          ],
+          [
+            this.db.Sequelize.literal(
+              "COUNT (CASE WHEN age >= 3 AND age <= 4 THEN age END)"
+            ),
+            "Under 4",
+          ],
+          [
+            this.db.Sequelize.literal(
+              "COUNT (CASE WHEN age >= 4 AND age <= 5 THEN age END)"
+            ),
+            "Under 5",
+          ],
+          // [
+          //   this.db.Sequelize.fn("count", this.db.Sequelize.col("age")),
+          //   "count",
+          // ],
+        ],
+      },
+      req
+    );
+
+    list = JSON.parse(JSON.stringify(list))[0];
+
+    const chartLabels = Object.keys(list);
+    const chartData = [
+      {
+        name: "number of children",
+        data: Object.values(list),
+      },
+    ];
+
+    return {
+      chartLabels,
+      chartData,
+    };
   }
 
   async _groupByAgeRange(_, req) {
@@ -364,8 +428,8 @@ module.exports = class extends AbstractController {
         label:
           item.hasPhone !== null
             ? item.hasPhone
-              ? "Yes"
-              : "No"
+              ? "Phone"
+              : "No Phone"
             : "Unavailable",
         value: +item.count,
       };
@@ -430,7 +494,8 @@ module.exports = class extends AbstractController {
   }
 
   async getBeneficiaryGroupingData(_, req) {
-    const ageRange = await this._groupByAgeRange(_, req);
+    const ageRange = await this._groupByChildrenUnder5(_, req);
+    // const ageRange = await this._groupByAgeRange(_, req);
     const landOwner = await this._groupByLandOwner(_, req);
     const disability = await this._groupByDisability(_, req);
     const dailyWage = await this._groupByDailyWage(_, req);

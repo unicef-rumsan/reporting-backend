@@ -29,18 +29,20 @@ module.exports = class extends AbstractController {
       let transaction = await this.table.create(payload);
       const beneficiaries = await this.tblBeneficiaries.findOne({
         where: {
-          phone: transaction.phone,
+          phone: transaction.beneficiary,
         },
         raw: true,
         nest: true,
       });
+
+      console.log("beneficiaries", beneficiaries);
 
       transaction = JSON.parse(JSON.stringify(transaction));
 
       WSService.broadcast(
         {
           ...transaction,
-          name: beneficiaries.name,
+          name: beneficiaries?.name ?? null,
         },
         "rahat_claimed"
       );
@@ -99,7 +101,7 @@ module.exports = class extends AbstractController {
     const list = await this.table.findAll({
       limit: 10,
       raw: true,
-      order: [["createdAt", "DESC"]],
+      order: [["timestamp", "DESC"]],
       // order: [["timestamp", "DESC"]],
     });
     const beneficiaryMapped = await this._replaceWithBeneficiaryName(list);
@@ -117,9 +119,9 @@ module.exports = class extends AbstractController {
       raw: true,
     });
     const beneficiaryMapped = await this._replaceWithBeneficiaryName(list);
-    console.log("first", beneficiaryMapped);
 
-    return list;
+    return beneficiaryMapped;
+    // return list;
   }
   async update(txHash, updateData) {
     const transaction = await this.table.update(updateData, {

@@ -17,7 +17,7 @@ async function connectToTestDatbase() {
 }
 
 async function closeConnection(connection) {
-  console.log({ connection });
+  // console.log({ connection });
   const { client, pool } = connection;
   await client.release();
   await pool.end();

@@ -13,7 +13,7 @@
     "migrate:create": "npx sequelize-cli db:create",
     "migrate:up": "npx sequelize-cli db:migrate",
     "migrate:undo": "npx sequelize-cli db:migrate:undo",
-    "test": "cross-env NODE_ENV=development jest --runInBand --detectOpenHandles ./tests",
+    "test": "cross-env NODE_ENV=development jest --runInBand --detectOpenHandles ./tests/controllers ",
     "test:watch": "cross-env NODE_ENV=development jest --runInBand --detectOpenHandles --watch ./tests"
   },
   "author": {
@@ -51,6 +51,7 @@
     "@rumsan/core": "^1.0.601",
     "axios": "^0.27.2",
     "config": "^3.3.1",
+    "cross-env": "~7.0.3",
     "dotenv": "^16.0.1",
     "ethers": "^5.7.0",
     "hapi-swagger": "^14.0.0",
@@ -67,6 +68,7 @@
   },
   "devDependencies": {
     "@faker-js/faker": "^7.5.0",
+    "@types/supertest": "~2.0.12",
     "eslint": "^7.7.0",
     "eslint-config-airbnb-base": "^14.2.0",
     "eslint-config-prettier": "^6.11.0",
@@ -79,6 +81,6 @@
     "prettier": "^2.1.1",
     "prettier-plugin-solidity": "^1.0.0-alpha.57",
     "sequelize-cli": "^6.4.1",
-    "supertest": "^6.3.0"
+    "supertest": "~6.3.0"
   }
 }

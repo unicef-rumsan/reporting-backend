@@ -18,7 +18,7 @@ DROP TABLE IF EXISTS "tblVendors";
 
 beforeAll(async () => {
   // TODO: Match the DB configuration and connections for API as well
-  console.log("Jest setup for Controller");
+  // console.log("Jest setup for Controller");
   await db.authenticate();
   await db.query(dropTables);
   await db.sync();

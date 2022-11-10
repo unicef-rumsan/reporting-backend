@@ -44,7 +44,7 @@ module.exports = class extends AbstractController {
   }
 
   async getById(id, req) {
-    checkToken(req);
+    // checkToken(req);
     return this.table.findByPk(id);
   }
 

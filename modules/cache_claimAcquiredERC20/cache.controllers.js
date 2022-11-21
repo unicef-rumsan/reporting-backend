@@ -27,6 +27,7 @@ module.exports = class extends AbstractController {
   async add(payload) {
     try {
       let transaction = await this.table.create(payload);
+      console.log("transaction", transaction);
       const beneficiaries = await this.tblBeneficiaries.findOne({
         where: {
           phone: transaction.beneficiary,
@@ -34,8 +35,6 @@ module.exports = class extends AbstractController {
         raw: true,
         nest: true,
       });
-
-      console.log("beneficiaries", beneficiaries);
 
       transaction = JSON.parse(JSON.stringify(transaction));
 
@@ -67,7 +66,7 @@ module.exports = class extends AbstractController {
         saved = JSON.parse(JSON.stringify(saved));
         // saved = await this._replaceWithBeneficiaryName(saved);
 
-        WSService.broadcast(saved, "rahat_claimed");
+        // WSService.broadcast(saved, "rahat_claimed");
         return `${filtered.length} new transactions added`;
       }
     } catch (err) {

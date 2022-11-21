@@ -20,6 +20,7 @@ module.exports = class extends AbstractController {
     getTransactionsCountByMethod: () => this.getTransactionsCountByMethod(),
     getTransactionsCountByMode: () => this.getTransactionsCountByMode(),
     getCountByWard: (req) => this.getCountByWard(req.query.year, req),
+    groupWardByGender: (req) => this.groupWardByGender(req.query.ward, req),
     getBeneficiariesCounts: (req) => this.getBeneficiariesCounts(null, req),
     getBeneficiaryGroupingData: (req) =>
       this.getBeneficiaryGroupingData(null, req),
@@ -35,39 +36,18 @@ module.exports = class extends AbstractController {
     return list;
   }
 
-  async getBeneficiaryCountByGender(req) {
-    const list = await finderByProjectId(
-      this.tblBeneficiaries,
-      {
-        attributes: [
-          "gender",
-          [this.db.Sequelize.fn("COUNT", "group"), "count"],
-        ],
-        group: ["gender"],
-      },
-      req
-    );
-
-    return list;
-  }
-
-  async getTransactionsCountByMethod() {
-    const list = await this.tblTxs.findAll({
-      attributes: [
-        "method",
-        [this.db.Sequelize.fn("COUNT", "method"), "value"],
-      ],
-      group: ["method"],
-    });
-    return list;
-  }
   async getTransactionsCountByMode() {
-    const list = await this.tblTxs.findAll({
+    let list = await this.tblTxs.findAll({
       attributes: ["mode", [this.db.Sequelize.fn("COUNT", "mode"), "value"]],
       group: ["mode"],
     });
+
     return list;
   }
+
+  /**
+   * Real Time Reports
+   */
 
   async getCountByWard(year, req) {
     // year = year || new Date().getFullYear();
@@ -75,6 +55,11 @@ module.exports = class extends AbstractController {
     let list = await finderByProjectId(
       this.tblBeneficiaries,
       {
+        where: {
+          ward: {
+            [Op.ne]: null,
+          },
+        },
         attributes: [
           "ward",
           [this.db.Sequelize.fn("COUNT", "ward"), "count"],
@@ -116,6 +101,65 @@ module.exports = class extends AbstractController {
     };
 
     return data;
+  }
+
+  // group ward by gender
+  async _groupWardByKey(ward, groupKey, req) {
+    groupKey = groupKey ?? "gender";
+    let list = await finderByProjectId(
+      this.tblBeneficiaries,
+      {
+        where: {
+          ward,
+        },
+        attributes: [
+          groupKey,
+          [this.db.Sequelize.fn("COUNT", "group"), "count"],
+        ],
+        group: [groupKey],
+      },
+      req
+    );
+    list = JSON.parse(JSON.stringify(list));
+    return {
+      ward,
+      list,
+    };
+  }
+
+  async groupWardByGender(ward, req) {
+    let genderGroupList = await this._groupWardByKey(ward, "gender", req);
+    const chartLabel = genderGroupList.list.map((item) => item.gender);
+    const chartValues = genderGroupList.list.map((item) => item.count);
+    const data = {
+      // allAvailableYears: yearList,
+      chartLabel,
+      chartData: [
+        {
+          // year,
+          name: "count",
+          data: chartValues,
+        },
+      ],
+    };
+
+    return data;
+  }
+
+  async getBeneficiaryCountByGender(req) {
+    const list = await finderByProjectId(
+      this.tblBeneficiaries,
+      {
+        attributes: [
+          "gender",
+          [this.db.Sequelize.fn("COUNT", "group"), "count"],
+        ],
+        group: ["gender"],
+      },
+      req
+    );
+
+    return list;
   }
 
   async getBeneficiariesCounts(_, req) {
@@ -192,70 +236,6 @@ module.exports = class extends AbstractController {
     };
 
     return data;
-  }
-
-  async _groupByChildrenUnder5(_, req) {
-    let list = await finderByProjectId(
-      this.tblBeneficiaries,
-      {
-        where: {
-          // age: {
-          // [Op.not]: null,
-          // [Op.notIn]: ["u", "undefined", "x", "", null],
-          // },
-        },
-        attributes: [
-          [
-            this.db.Sequelize.literal("COUNT (CASE WHEN age < 0 THEN age END)"),
-            "Under 0",
-          ],
-          [
-            this.db.Sequelize.literal(
-              "COUNT (CASE WHEN age >= 0 AND age <= 1 THEN age END)"
-            ),
-            "Under 2",
-          ],
-          [
-            this.db.Sequelize.literal(
-              "COUNT (CASE WHEN age >= 1 AND age <= 2 THEN age END)"
-            ),
-            "Under 3",
-          ],
-          [
-            this.db.Sequelize.literal(
-              "COUNT (CASE WHEN age >= 3 AND age <= 4 THEN age END)"
-            ),
-            "Under 4",
-          ],
-          [
-            this.db.Sequelize.literal(
-              "COUNT (CASE WHEN age >= 4 AND age <= 5 THEN age END)"
-            ),
-            "Under 5",
-          ],
-          // [
-          //   this.db.Sequelize.fn("count", this.db.Sequelize.col("age")),
-          //   "count",
-          // ],
-        ],
-      },
-      req
-    );
-
-    list = JSON.parse(JSON.stringify(list))[0];
-
-    const chartLabels = Object.keys(list);
-    const chartData = [
-      {
-        name: "number of children",
-        data: Object.values(list),
-      },
-    ];
-
-    return {
-      chartLabels,
-      chartData,
-    };
   }
 
   async _groupByAgeRange(_, req) {
@@ -409,34 +389,34 @@ module.exports = class extends AbstractController {
     return list;
   }
 
-  async _groupByPhoneOwnership(_, req) {
-    let list = await finderByProjectId(
-      this.tblBeneficiaries,
-      {
-        attributes: [
-          "hasPhone",
-          [this.db.Sequelize.fn("COUNT", "hasPhone"), "count"],
-        ],
-        group: ["hasPhone"],
-      },
-      req
-    );
-    list = JSON.parse(JSON.stringify(list));
+  // async _groupByPhoneOwnership(_, req) {
+  //   let list = await finderByProjectId(
+  //     this.tblBeneficiaries,
+  //     {
+  //       attributes: [
+  //         "hasPhone",
+  //         [this.db.Sequelize.fn("COUNT", "hasPhone"), "count"],
+  //       ],
+  //       group: ["hasPhone"],
+  //     },
+  //     req
+  //   );
+  //   list = JSON.parse(JSON.stringify(list));
 
-    list = list.map((item) => {
-      return {
-        label:
-          item.hasPhone !== null
-            ? item.hasPhone
-              ? "Phone"
-              : "No Phone"
-            : "Unavailable",
-        value: +item.count,
-      };
-    });
+  //   list = list.map((item) => {
+  //     return {
+  //       label:
+  //         item.hasPhone !== null
+  //           ? item.hasPhone
+  //             ? "Phone"
+  //             : "No Phone"
+  //           : "Unavailable",
+  //       value: +item.count,
+  //     };
+  //   });
 
-    return list;
-  }
+  //   return list;
+  // }
 
   async _groupByHasBank(_, req) {
     let list = await finderByProjectId(
@@ -456,7 +436,11 @@ module.exports = class extends AbstractController {
     list = list.map((item) => {
       return {
         label:
-          item.hasBank !== null ? (item.hasBank ? "Yes" : "No") : "Unavailable",
+          item.hasBank !== null
+            ? item.hasBank
+              ? "Banked"
+              : "Unbanked"
+            : "Unavailable",
         value: +item.count,
       };
     });
@@ -483,8 +467,8 @@ module.exports = class extends AbstractController {
         label:
           item.hasPhone !== null
             ? item.hasPhone
-              ? "Yes"
-              : "No"
+              ? "Phone"
+              : "No Phone"
             : "Unavailable",
         value: +item.count,
       };
@@ -493,13 +477,117 @@ module.exports = class extends AbstractController {
     return list;
   }
 
+  /**
+   * End of the day
+   */
+
+  async _groupByChildrenUnder5(_, req) {
+    let list = await finderByProjectId(
+      this.tblBeneficiaries,
+      {
+        where: {
+          // age: {
+          //   [Op.not]: null,
+          //   // [Op.notIn]: ["u", "undefined", "x", "", null],
+          // },
+        },
+        attributes: [
+          [
+            this.db.Sequelize.literal("COUNT (CASE WHEN age < 0 THEN age END)"),
+            "Under 0",
+          ],
+          [
+            this.db.Sequelize.literal(
+              "COUNT (CASE WHEN age >= 0 AND age <= 1 THEN age END)"
+            ),
+            "Under 2",
+          ],
+          [
+            this.db.Sequelize.literal(
+              "COUNT (CASE WHEN age >= 1 AND age <= 2 THEN age END)"
+            ),
+            "Under 3",
+          ],
+          [
+            this.db.Sequelize.literal(
+              "COUNT (CASE WHEN age >= 3 AND age <= 4 THEN age END)"
+            ),
+            "Under 4",
+          ],
+          [
+            this.db.Sequelize.literal(
+              "COUNT (CASE WHEN age >= 4 AND age <= 5 THEN age END)"
+            ),
+            "Under 5",
+          ],
+          // [
+          //   this.db.Sequelize.fn("count", this.db.Sequelize.col("age")),
+          //   "count",
+          // ],
+        ],
+      },
+      req
+    );
+
+    list = JSON.parse(JSON.stringify(list))[0];
+
+    const chartLabels = Object.keys(list);
+    const chartData = [
+      {
+        name: "number of children",
+        data: Object.values(list),
+      },
+    ];
+
+    return {
+      chartLabels,
+      chartData,
+    };
+  }
+
+  // online vs offline
+
+  async getTransactionsCountByMethod() {
+    let totalClaimed = await this.tblTxs.findAll({
+      where: {
+        method: {
+          [Op.not]: "unavailable",
+          // [Op.notIn]: ["unavailable", "undefined", "x", "", null],
+        },
+      },
+      attributes: [
+        "method",
+        [this.db.Sequelize.fn("COUNT", "method"), "value"],
+      ],
+      group: ["method"],
+    });
+    totalClaimed = JSON.parse(JSON.stringify(totalClaimed));
+    const chartLabel = totalClaimed.map((item) => item.method);
+
+    const chartData = [
+      {
+        name: "Total Sent",
+        data: totalClaimed.map((item) => +item.value * 1.5),
+      },
+      {
+        name: "Claimed",
+        data: totalClaimed.map((item) => +item.value),
+      },
+    ];
+
+    return {
+      chartLabel,
+      chartData,
+    };
+  }
+
   async getBeneficiaryGroupingData(_, req) {
     const ageRange = await this._groupByChildrenUnder5(_, req);
     // const ageRange = await this._groupByAgeRange(_, req);
     const landOwner = await this._groupByLandOwner(_, req);
     const disability = await this._groupByDisability(_, req);
     const dailyWage = await this._groupByDailyWage(_, req);
-    const phoneOwnership = await this._groupByPhoneOwnership(_, req);
+    // const phoneOwnership = await this._groupByPhoneOwnership(_, req);
     const hasBank = await this._groupByHasBank(_, req);
     const hasPhone = await this._groupByHasPhone(_, req);
 
@@ -508,7 +596,7 @@ module.exports = class extends AbstractController {
       landOwner,
       disability,
       dailyWage,
-      phoneOwnership,
+      // phoneOwnership,
       hasBank,
       hasPhone,
     };

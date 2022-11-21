@@ -11,7 +11,13 @@ const schema = {
   agency: Sequelize.STRING,
   name: Sequelize.STRING,
   gender: Sequelize.STRING,
-  phone: Sequelize.STRING,
+  phone: {
+    type: Sequelize.STRING,
+    set(v) {
+      let isPhoneFake = v.startsWith("999");
+      this.setDataValue("isQR", isPhoneFake);
+    },
+  },
   age: Sequelize.INTEGER,
   child: Sequelize.INTEGER,
   numOfAdults: Sequelize.INTEGER,
@@ -34,6 +40,13 @@ const schema = {
   bankAccountNumber: Sequelize.STRING,
   mobilizer: Sequelize.STRING,
   ward: Sequelize.STRING,
+  isClaimed: Sequelize.BOOLEAN,
+  isOnline: Sequelize.BOOLEAN,
+  tokenIssued: Sequelize.BOOLEAN,
+  tokenBalance: Sequelize.INTEGER,
+  isQR: Sequelize.BOOLEAN,
+  // total token Issued, claimed (claimed>= issued = isClaimed true) isIssued = boolean
+  // claimedAmount, issuedAmount, date, issuerPhone, txHash(opt) -- issued table
 };
 
 module.exports = class extends AbstractModel {

@@ -50,6 +50,10 @@ const schema = {
     type: Sequelize.ENUM("online", "offline", "unavailable"),
     defaultValue: "unavailable",
   },
+  isClaimed: Sequelize.BOOLEAN,
+  // isOnline: Sequelize.BOOLEAN,
+  tokenIssued: Sequelize.BOOLEAN,
+  tokenBalance: Sequelize.INTEGER,
 };
 
 module.exports = class extends AbstractModel {

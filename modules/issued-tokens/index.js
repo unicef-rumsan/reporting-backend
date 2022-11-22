@@ -13,8 +13,8 @@ module.exports = class extends AbstractRouter {
   routes = {
     add: {
       method: "POST",
-      path: "",
-      description: "Add new Beneficiary",
+      path: "/add",
+      description: "Add new Issue data",
     },
   };
 };

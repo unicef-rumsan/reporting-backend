@@ -183,6 +183,7 @@ const scripts = {
         return {
           id: tx?.id,
           txHash: tx.txHash,
+          beneficiary: tx.beneficiary,
           method: log.extras
             ? log.extras?.isPhone
               ? "sms"
@@ -194,6 +195,10 @@ const scripts = {
               : "online"
             : "unavailable",
           ward: log.extras ? log.extras?.ward : 0,
+          isClaimed: log.extras?.isClaimed,
+          // isOnline: log.extras?.isOnline,
+          tokenIssued: log.extras?.tokenIssued,
+          // tokenBalance: log.extras?.tokenBalance,
         };
       });
 
@@ -217,10 +222,31 @@ const scripts = {
 
       for (missingTransaction of trasactionsWithMissingValues) {
         const { id, txHash, ...transaction } = missingTransaction;
+
         await axios.patch(
           `${urlConfig.reportingUrl}/claimAcquiredERC20Transactions/update/${txHash}`,
           transaction
         );
+        // await new Promise((resolve) => setTimeout(resolve, 1000));
+
+        console.log("Updating beneficiary info");
+        await axios.patch(
+          `${urlConfig.reportingUrl}/beneficiaries/updateExplorerTokenInfo/${transaction.beneficiary}`,
+          {
+            tokenBalance: transaction.tokenBalance,
+            tokenIssued: transaction.tokenIssued,
+            isOnline: transaction.isOnline,
+          }
+        );
+
+        // await new Promise((resolve) => setTimeout(resolve, 1000));
+        // console.log("Updating token issue model");
+
+        await axios.post(`${urlConfig.reportingUrl}/issued-tokens/add`, {
+          issuerPhone: transaction.beneficiary,
+          date: transaction.timestamp,
+          claimedAmount: transaction.amount,
+        });
       }
       console.log(`Missing values for transactions updated`);
       console.log("----------------------------------------");

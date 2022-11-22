@@ -16,6 +16,12 @@ module.exports = class extends AbstractController {
     list: (req) => this.list(req.query, req),
     getById: (req) => this.getById(req.params.id, req),
     bulkAdd: (req) => this.bulkAdd(req.payload, req),
+    updateExplorerTokenInfo: (req) =>
+      this.updateExplorerTokenInfo(
+        req.params.beneficiaryPhone,
+        req.payload,
+        req
+      ),
     getBeneficiaryCountByGroup: (req) => this.getBeneficiaryCountByGroup(),
     getBeneficiaryCountByGender: (req) => this.getBeneficiaryCountByGender(),
   };
@@ -48,6 +54,21 @@ module.exports = class extends AbstractController {
   async getById(id, req) {
     checkToken(req);
     return this.table.findByPk(id);
+  }
+
+  async updateExplorerTokenInfo(phone, payload, req) {
+    const { isClaimed, isOnline, tokenIssued, tokenBalance } = payload;
+
+    const beneficiary = await this.table.findOne({ where: { phone } });
+
+    if (beneficiary) {
+      beneficiary.isClaimed = isClaimed;
+      beneficiary.isOnline = isOnline;
+      beneficiary.tokenIssued = tokenIssued;
+      beneficiary.tokenBalance = tokenBalance;
+      beneficiary.save();
+    }
+    return beneficiary;
   }
 
   // reporting

@@ -14,6 +14,7 @@ module.exports = class extends AbstractController {
   };
 
   async add(payload, req) {
+    console.log("payload", payload);
     // checkToken(req);
     try {
       return this.table.create(payload);

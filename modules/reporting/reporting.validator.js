@@ -7,6 +7,21 @@ const validators = {
       ward: Joi.string().required(),
     }),
   },
+  groupWardByClaim: {
+    query: Joi.object({
+      ward: Joi.string().required(),
+    }),
+  },
+  groupWardByLandOwnership: {
+    query: Joi.object({
+      ward: Joi.string().required(),
+    }),
+  },
+  groupWardByDisability: {
+    query: Joi.object({
+      ward: Joi.string().required(),
+    }),
+  },
 };
 
 module.exports = class extends AbstractValidator {

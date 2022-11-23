@@ -1,5 +1,6 @@
 const { AbstractController } = require("@rumsan/core/abstract");
 const { Op } = require("sequelize");
+const { groupBy } = require("../../helpers/utils/groupByKey");
 const { finderByProjectId } = require("../../helpers/utils/projectFinder");
 const {
   BeneficiaryModel,
@@ -20,7 +21,13 @@ module.exports = class extends AbstractController {
     getTransactionsCountByMethod: () => this.getTransactionsCountByMethod(),
     getTransactionsCountByMode: () => this.getTransactionsCountByMode(),
     getCountByWard: (req) => this.getCountByWard(req.query.year, req),
+    getStackedGenderByWard: (req) => this.getStackedGenderByWard(req),
     groupWardByGender: (req) => this.groupWardByGender(req.query.ward, req),
+    groupWardByClaim: (req) => this.groupWardByClaim(req.query.ward, req),
+    groupWardByLandOwnership: (req) =>
+      this.groupWardByLandOwnership(req.query.ward, req),
+    groupWardByDisability: (req) =>
+      this.groupWardByDisability(req.query.ward, req),
     getBeneficiariesCounts: (req) => this.getBeneficiariesCounts(null, req),
     getBeneficiaryGroupingData: (req) =>
       this.getBeneficiaryGroupingData(null, req),
@@ -49,9 +56,7 @@ module.exports = class extends AbstractController {
    * Real Time Reports
    */
 
-  async getCountByWard(year, req) {
-    // year = year || new Date().getFullYear();
-    // const list = await finderByProjectId(this.tblTxs)
+  async getStackedGenderByWard(req) {
     let list = await finderByProjectId(
       this.tblBeneficiaries,
       {
@@ -63,41 +68,115 @@ module.exports = class extends AbstractController {
         attributes: [
           "ward",
           [this.db.Sequelize.fn("COUNT", "ward"), "count"],
+          "gender",
+          [this.db.Sequelize.fn("COUNT", "gender"), "genderCount"],
+        ],
+
+        order: [
+          ["ward", "ASC"],
+          // ["gender", "ASC"],
+        ],
+
+        group: ["ward", "gender"],
+      },
+      req
+    );
+
+    list = JSON.parse(JSON.stringify(list));
+
+    let itemGroup = groupBy("gender")(list);
+
+    let grp = Object.keys(itemGroup).map((key) => {
+      console.log("key", key);
+      return {
+        name: key,
+        data: itemGroup[key].map((i) => i.genderCount),
+      };
+    });
+
+    const chartLabel = list.map((item) => `Ward ${item.ward}` ?? "Unavailable");
+    const chartValues = list.map((item) => +item.count);
+    // let item = groupBy("ward")(list);
+
+    // item = Object.keys(item).map((key) => {
+    //   return {
+    //     ward: key,
+    //     m: item[key].map((item) => {
+    //       return {
+    //         gender: item.gender,
+    //         count: item.genderCount,
+    //       };
+    //     }),
+    //   };
+    // });
+
+    // console.log("item", JSON.stringify(item, null, 2));
+    const data = {
+      // allAvailableYears: yearList,
+      chartLabel: [...new Set(chartLabel)],
+      chartData: grp,
+      // chartData: [
+      //   {
+      //     // year,
+      //     name: "count",
+      //     data: chartValues,
+      //   },
+      // ],
+    };
+
+    return data;
+  }
+  async getCountByWard(year, req) {
+    let list = await finderByProjectId(
+      this.tblBeneficiaries,
+      {
+        where: {
+          ward: {
+            [Op.ne]: null,
+          },
+        },
+        attributes: [
+          "ward",
+          [this.db.Sequelize.fn("COUNT", "ward"), "count"],
+          "isClaimed",
+          [this.db.Sequelize.fn("COUNT", "isClaimed"), "claimedCount"],
           // "year",
         ],
 
-        order: [["ward", "ASC"]],
+        // order: [
+        //   ["ward", "ASC"],
+        //   ["isClaimed", "ASC"],
+        // ],
 
         group: [
           "ward",
+          "isClaimed",
           // "year"
         ],
       },
       req
     );
-
-    // const yearList = [
-    //   ...new Set(
-    //     JSON.parse(JSON.stringify(await this.tblTxs.findAll({}))).map(
-    //       (i) => i.year
-    //     )
-    //   ),
-    // ];
-
     list = JSON.parse(JSON.stringify(list));
 
+    let itemGroup = groupBy("isClaimed")(list);
+
+    let chartData = Object.keys(itemGroup).map((key) => {
+      return {
+        name:
+          key !== "null"
+            ? key === "false"
+              ? "Not Claimed"
+              : "Claimed"
+            : "Unknown",
+        data: itemGroup[key].map((i) => i.claimedCount),
+      };
+    });
+
     const chartLabel = list.map((item) => `Ward ${item.ward}` ?? "Unavailable");
-    const chartValues = list.map((item) => +item.count);
+
     const data = {
-      // allAvailableYears: yearList,
-      chartLabel,
-      chartData: [
-        {
-          // year,
-          name: "count",
-          data: chartValues,
-        },
-      ],
+      chartLabel: [...new Set(chartLabel)],
+      chartData,
     };
 
     return data;
@@ -130,6 +209,75 @@ module.exports = class extends AbstractController {
   async groupWardByGender(ward, req) {
     let genderGroupList = await this._groupWardByKey(ward, "gender", req);
     const chartLabel = genderGroupList.list.map((item) => item.gender);
+    const chartValues = genderGroupList.list.map((item) => item.count);
+    const data = {
+      // allAvailableYears: yearList,
+      chartLabel,
+      chartData: [
+        {
+          // year,
+          name: "count",
+          data: chartValues,
+        },
+      ],
+    };
+
+    return data;
+  }
+  async groupWardByLandOwnership(ward, req) {
+    let genderGroupList = await this._groupWardByKey(ward, "noLand", req);
+    const chartLabel = genderGroupList.list.map((item) =>
+      item.noLand !== null ? (item.noLand ? "No Land" : "Land") : "Unknown"
+    );
+    const chartValues = genderGroupList.list.map((item) => item.count);
+    const data = {
+      // allAvailableYears: yearList,
+      chartLabel,
+      chartData: [
+        {
+          // year,
+          name: "count",
+          data: chartValues,
+        },
+      ],
+    };
+
+    return data;
+  }
+  async groupWardByDisability(ward, req) {
+    let genderGroupList = await this._groupWardByKey(ward, "disability", req);
+    const chartLabel = genderGroupList.list.map((item) =>
+      item.disability !== null
+        ? item.disability
+          ? "Disabled"
+          : "Not Disabled"
+        : "Unknown"
+    );
+    const chartValues = genderGroupList.list.map((item) => item.count);
+    const data = {
+      // allAvailableYears: yearList,
+      chartLabel,
+      chartData: [
+        {
+          // year,
+          name: "count",
+          data: chartValues,
+        },
+      ],
+    };
+
+    return data;
+  }
+
+  async groupWardByClaim(ward, req) {
+    let genderGroupList = await this._groupWardByKey(ward, "isClaimed", req);
+    const chartLabel = genderGroupList.list.map((item) =>
+      item.isClaimed !== null
+        ? item.isClaimed
+          ? "Claimed"
+          : "Not Claimed"
+        : "Unavailable"
+    );
     const chartValues = genderGroupList.list.map((item) => item.count);
     const data = {
       // allAvailableYears: yearList,

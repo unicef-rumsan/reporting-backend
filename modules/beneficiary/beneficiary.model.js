@@ -41,7 +41,7 @@ const schema = {
   mobilizer: Sequelize.STRING,
   ward: Sequelize.STRING,
   isClaimed: Sequelize.BOOLEAN,
-  isOffline: Sequelize.BOOLEAN,
+  isOnline: Sequelize.BOOLEAN,
   tokenIssued: Sequelize.BOOLEAN,
   isQR: Sequelize.BOOLEAN,
   // total token Issued, claimed (claimed>= issued = isClaimed true) isIssued = boolean

@@ -194,11 +194,10 @@ const scripts = {
               ? "offline"
               : "online"
             : "unavailable",
+          isOffline: log.extras?.isOffline,
           ward: log.extras ? log.extras?.ward : 0,
           isClaimed: log.extras?.isClaimed,
-          // isOnline: log.extras?.isOnline,
           tokenIssued: log.extras?.tokenIssued,
-          // tokenBalance: log.extras?.tokenBalance,
         };
       });
 
@@ -227,17 +226,17 @@ const scripts = {
           `${urlConfig.reportingUrl}/claimAcquiredERC20Transactions/update/${txHash}`,
           transaction
         );
-        // await new Promise((resolve) => setTimeout(resolve, 1000));
 
-        console.log("Updating beneficiary info");
         await axios.patch(
           `${urlConfig.reportingUrl}/beneficiaries/updateExplorerTokenInfo/${transaction.beneficiary}`,
           {
-            tokenBalance: transaction.tokenBalance,
+            ward: transaction.ward,
+            isClaimed: transaction.isClaimed,
             tokenIssued: transaction.tokenIssued,
-            isOnline: transaction.isOnline,
+            isOffline: transaction.isOffline,
           }
         );
+        // await new Promise((resolve) => setTimeout(resolve, 1000));
 
         // await new Promise((resolve) => setTimeout(resolve, 1000));
         // console.log("Updating token issue model");
@@ -246,6 +245,7 @@ const scripts = {
           issuerPhone: transaction.beneficiary,
           date: transaction.timestamp,
           claimedAmount: transaction.amount,
+          txHash,
         });
       }
       console.log(`Missing values for transactions updated`);
@@ -256,10 +256,31 @@ const scripts = {
       console.log("error", error?.response?.data.message);
     }
   },
+
+  async updateBeneficiaryClaimData() {
+    const transactionValue = await this.getModifiedTransactionLogs();
+
+    console.log("transactionValue", transactionValue);
+
+    console.log(`Updating Beneficiary Claim Data`);
+    console.log("----------------------------------------");
+
+    // for (transaction of transactionValue) {
+    //   const { beneficiary, isClaimed, isOffline, tokenIssued } = transaction;
+    await axios.post(
+      `${urlConfig.reportingUrl}/beneficiaries/updateExplorerTokenInfo`,
+      transactionValue
+    );
+    // }
+
+    console.log(`Beneficiary Claim Data updated`);
+    console.log("----------------------------------------");
+  },
 };
 
 (async () => {
   await scripts.getLogsFromExplorer();
   await scripts.getModifiedDecodedLogs();
   await scripts.updateMissingTransactionValue();
+  // await scripts.updateBeneficiaryClaimData();
 })();

@@ -16,6 +16,7 @@ const schema = {
     set(v) {
       let isPhoneFake = v.startsWith("999");
       this.setDataValue("isQR", isPhoneFake);
+      this.setDataValue("phone", v);
     },
   },
   age: Sequelize.INTEGER,
@@ -41,8 +42,8 @@ const schema = {
   mobilizer: Sequelize.STRING,
   ward: Sequelize.STRING,
   isClaimed: Sequelize.BOOLEAN,
-  isOnline: Sequelize.BOOLEAN,
-  tokenIssued: Sequelize.BOOLEAN,
+  isOffline: Sequelize.BOOLEAN,
+  tokenIssued: Sequelize.STRING,
   isQR: Sequelize.BOOLEAN,
   // total token Issued, claimed (claimed>= issued = isClaimed true) isIssued = boolean
   // claimedAmount, issuedAmount, date, issuerPhone, txHash(opt) -- issued table

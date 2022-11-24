@@ -52,8 +52,7 @@ const schema = {
   },
   isClaimed: Sequelize.BOOLEAN,
   // isOnline: Sequelize.BOOLEAN,
-  tokenIssued: Sequelize.BOOLEAN,
-  tokenBalance: Sequelize.INTEGER,
+  tokenIssued: Sequelize.STRING,
 };
 
 module.exports = class extends AbstractModel {

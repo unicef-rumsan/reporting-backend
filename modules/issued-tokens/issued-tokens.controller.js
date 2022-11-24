@@ -14,10 +14,15 @@ module.exports = class extends AbstractController {
   };
 
   async add(payload, req) {
-    console.log("payload", payload);
-    // checkToken(req);
     try {
-      return this.table.create(payload);
+      const transaction = await this.table.findOne({
+        where: { txHash: payload.txHash },
+      });
+
+      if (!transaction) {
+        return this.table.create(payload);
+      }
+      return "Transaction Already Saved";
     } catch (err) {
       console.log(err);
     }

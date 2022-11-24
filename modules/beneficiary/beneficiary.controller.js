@@ -57,15 +57,14 @@ module.exports = class extends AbstractController {
   }
 
   async updateExplorerTokenInfo(phone, payload, req) {
-    const { isClaimed, isOnline, tokenIssued, tokenBalance } = payload;
+    const { isClaimed, isOffline, tokenIssued } = payload;
 
     const beneficiary = await this.table.findOne({ where: { phone } });
 
     if (beneficiary) {
       beneficiary.isClaimed = isClaimed;
-      beneficiary.isOnline = isOnline;
+      beneficiary.isOffline = isOffline;
       beneficiary.tokenIssued = tokenIssued;
-      beneficiary.tokenBalance = tokenBalance;
       beneficiary.save();
     }
     return beneficiary;

@@ -19,7 +19,7 @@ module.exports = class extends AbstractController {
     getBeneficiaryCountByGroup: () => this.getBeneficiaryCountByGroup(),
     getBeneficiaryCountByGender: (req) => this.getBeneficiaryCountByGender(req),
     getTransactionsCountByMethod: () => this.getTransactionsCountByMethod(),
-    getTransactionsCountByMode: () => this.getTransactionsCountByMode(),
+    getTransactionsCountByMode: (req) => this.getTransactionsCountByMode(req),
     getCountByWard: (req) => this.getCountByWard(req.query.year, req),
     getStackedGenderByWard: (req) => this.getStackedGenderByWard(req),
     groupWardByGender: (req) => this.groupWardByGender(req.query.ward, req),
@@ -43,11 +43,30 @@ module.exports = class extends AbstractController {
     return list;
   }
 
-  async getTransactionsCountByMode() {
-    let list = await this.tblTxs.findAll({
-      attributes: ["mode", [this.db.Sequelize.fn("COUNT", "mode"), "value"]],
-      group: ["mode"],
-    });
+  async getTransactionsCountByMode(req) {
+    let list = await finderByProjectId(
+      this.tblBeneficiaries,
+      {
+        attributes: [
+          "isOffline",
+          [this.db.Sequelize.fn("COUNT", "isOffline"), "count"],
+        ],
+        group: ["isOffline"],
+      },
+      req
+    );
+
+    list = JSON.parse(JSON.stringify(list));
+
+    list = list.map((item) => ({
+      isOnline:
+        item.isOffline !== null
+          ? item.isOffline
+            ? "Offline"
+            : "Online"
+          : "Unknown",
+      count: item.count,
+    }));
 
     return list;
   }
@@ -87,7 +106,6 @@ module.exports = class extends AbstractController {
     let itemGroup = groupBy("gender")(list);
 
     let grp = Object.keys(itemGroup).map((key) => {
-      console.log("key", key);
       return {
         name: key,
         data: itemGroup[key].map((i) => i.genderCount),
@@ -95,20 +113,7 @@ module.exports = class extends AbstractController {
     });
 
     const chartLabel = list.map((item) => `Ward ${item.ward}` ?? "Unavailable");
-    const chartValues = list.map((item) => +item.count);
-    // let item = groupBy("ward")(list);
-
-    // item = Object.keys(item).map((key) => {
-    //   return {
-    //     ward: key,
-    //     m: item[key].map((item) => {
-    //       return {
-    //         gender: item.gender,
-    //         count: item.genderCount,
-    //       };
-    //     }),
-    //   };
-    // });
+    // const chartValues = list.map((item) => +item.count);
 
     // console.log("item", JSON.stringify(item, null, 2));
     const data = {
@@ -310,6 +315,26 @@ module.exports = class extends AbstractController {
     return list;
   }
 
+  async _getClaimedBeneficiaryCount(req) {
+    let list = await finderByProjectId(
+      this.tblBeneficiaries,
+      {
+        where: {
+          isClaimed: true,
+        },
+        attributes: [
+          "isClaimed",
+          [this.db.Sequelize.fn("COUNT", "group"), "count"],
+        ],
+        group: ["isClaimed"],
+      },
+      req
+    );
+
+    list = JSON.parse(JSON.stringify(list))[0];
+    return list;
+  }
+
   async getBeneficiariesCounts(_, req) {
     let list = await finderByProjectId(
       this.tblBeneficiaries,
@@ -373,6 +398,7 @@ module.exports = class extends AbstractController {
       0
     );
 
+    const totalClaimed = await this._getClaimedBeneficiaryCount(req);
     const data = {
       impacted: {
         totalFamilyCount,
@@ -380,6 +406,7 @@ module.exports = class extends AbstractController {
         totalBelow5Male,
         totalBelow5Female,
         totalBelow5Other,
+        totalClaimed: totalClaimed ? totalClaimed.count : 0,
       },
     };
 
@@ -696,6 +723,7 @@ module.exports = class extends AbstractController {
   // online vs offline
 
   async getTransactionsCountByMethod() {
+    // ben table
     let totalClaimed = await this.tblTxs.findAll({
       where: {
         method: {
@@ -709,6 +737,9 @@ module.exports = class extends AbstractController {
       ],
       group: ["method"],
     });
+
+    // total amount of  beneficiaries amount
+    //  total fake number *1000 (assigned)  claimed, calculated from ben table
     totalClaimed = JSON.parse(JSON.stringify(totalClaimed));
     const chartLabel = totalClaimed.map((item) => item.method);
 

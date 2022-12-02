@@ -6,6 +6,9 @@ const _Beneficiaries = require("./beneficiary");
 const _Vendors = require("./vendor");
 const _Projects = require("./project");
 const _Reporting = require("./reporting");
+const _IssuedTokens = require("./issued-tokens");
+//const Tag = require("./tag");
+const { mailOtp } = require("./eventHandlers");
 const { EVENTS } = require("../constants/appConstants");
 
 let Routes = {
@@ -16,10 +19,11 @@ let Routes = {
   Vendors: new _Vendors(),
   Projects: new _Projects(),
   Reporting: new _Reporting(),
+  IssuedTokens: new _IssuedTokens(),
 };
 
 ContractListener.on(EVENTS.TRANSACTION_ADDED, (data) => {
-  Routes.Transactions._controllers.add(data);
+  Routes.TransactionsCacheClaimAcquiredERC20._controllers.add(data);
 });
 
 // ContractListener.on(EVENTS.TRANSACTION_ADDED_EXPLORER_BULK, (data) => {

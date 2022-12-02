@@ -27,9 +27,10 @@ module.exports = class extends AbstractController {
   async add(payload) {
     try {
       let transaction = await this.table.create(payload);
+      console.log("transaction", transaction);
       const beneficiaries = await this.tblBeneficiaries.findOne({
         where: {
-          phone: transaction.phone,
+          phone: transaction.beneficiary,
         },
         raw: true,
         nest: true,
@@ -40,7 +41,7 @@ module.exports = class extends AbstractController {
       WSService.broadcast(
         {
           ...transaction,
-          name: beneficiaries.name,
+          name: beneficiaries?.name ?? null,
         },
         "rahat_claimed"
       );
@@ -65,7 +66,7 @@ module.exports = class extends AbstractController {
         saved = JSON.parse(JSON.stringify(saved));
         // saved = await this._replaceWithBeneficiaryName(saved);
 
-        WSService.broadcast(saved, "rahat_claimed");
+        // WSService.broadcast(saved, "rahat_claimed");
         return `${filtered.length} new transactions added`;
       }
     } catch (err) {
@@ -74,26 +75,23 @@ module.exports = class extends AbstractController {
   }
 
   async _replaceWithBeneficiaryName(list) {
-    const phonesList = list.map((item) => item.phone);
+    const phonesList = list.map((item) => item.beneficiary);
     const beneficiaryList = await this.tblBeneficiaries.findAll({
       where: {
         phone: {
           [Op.in]: phonesList,
         },
       },
+      attributes: ["name", "phone"],
       raw: true,
     });
-
-    const beneficiaryMapped = list
-      .map((list) =>
-        beneficiaryList.map((benef) => {
-          return {
-            name: benef.name,
-            ...list,
-          };
-        })
-      )
-      .flatMap((e) => e);
+    const beneficiaryMapped = list.map((item) => {
+      let benef = beneficiaryList.find((b) => b.phone === item.beneficiary);
+      return {
+        ...benef,
+        ...item,
+      };
+    });
 
     return beneficiaryMapped;
   }
@@ -103,11 +101,11 @@ module.exports = class extends AbstractController {
       limit: 10,
       raw: true,
       order: [["timestamp", "DESC"]],
+      // order: [["timestamp", "DESC"]],
     });
     const beneficiaryMapped = await this._replaceWithBeneficiaryName(list);
-
-    return list;
-    // return beneficiaryMapped;
+    return beneficiaryMapped;
+    // return list;
   }
 
   async listByTxHashes(txHashes) {
@@ -116,23 +114,13 @@ module.exports = class extends AbstractController {
         txHash: {
           [Op.in]: txHashes,
         },
-        [Op.or]: [
-          {
-            mode: "unavailable",
-          },
-          {
-            method: "unavailable",
-          },
-          {
-            ward: 0,
-          },
-        ],
       },
       raw: true,
     });
-    // const beneficiaryMapped = await this._replaceWithBeneficiaryName(list);
+    const beneficiaryMapped = await this._replaceWithBeneficiaryName(list);
 
-    return list;
+    return beneficiaryMapped;
+    // return list;
   }
   async update(txHash, updateData) {
     const transaction = await this.table.update(updateData, {

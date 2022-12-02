@@ -20,20 +20,24 @@ const schema = {
     type: Sequelize.INTEGER,
     allowNull: false,
   },
-  phone: {
+  beneficiary: {
     type: Sequelize.STRING,
-    allowNull: false,
   },
+  // phone: {
+  //   type: Sequelize.STRING,
+  //   allowNull: false,
+  // },
   ward: {
     type: Sequelize.INTEGER,
     defaultValue: 0,
   },
   timestamp: {
-    type: "TIMESTAMP",
-    set(v) {
-      // this.setDataValue("timestamp", v.toISOString());
-      this.setDataValue("year", new Date(v).getFullYear());
-    },
+    type: Sequelize.INTEGER,
+    // allowNull: false,
+    // set(v) {
+    //   // this.setDataValue("timestamp", v.toISOString());
+    //   this.setDataValue("year", new Date(v).getFullYear());
+    // },
   },
   year: {
     type: Sequelize.STRING,
@@ -46,6 +50,9 @@ const schema = {
     type: Sequelize.ENUM("online", "offline", "unavailable"),
     defaultValue: "unavailable",
   },
+  isClaimed: Sequelize.BOOLEAN,
+  // isOnline: Sequelize.BOOLEAN,
+  tokenIssued: Sequelize.STRING,
 };
 
 module.exports = class extends AbstractModel {

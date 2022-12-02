@@ -1,6 +1,7 @@
 const { AbstractController } = require("@rumsan/core/abstract");
 const WSService = require("@rumsan/core/services/webSocket");
 const checkToken = require("../../helpers/utils/checkToken");
+const { finderByProjectId } = require("../../helpers/utils/projectFinder");
 const { BeneficiaryModel } = require("../models");
 
 module.exports = class extends AbstractController {
@@ -15,6 +16,12 @@ module.exports = class extends AbstractController {
     list: (req) => this.list(req.query, req),
     getById: (req) => this.getById(req.params.id, req),
     bulkAdd: (req) => this.bulkAdd(req.payload, req),
+    updateExplorerTokenInfo: (req) =>
+      this.updateExplorerTokenInfo(
+        req.params.beneficiaryPhone,
+        req.payload,
+        req
+      ),
     getBeneficiaryCountByGroup: (req) => this.getBeneficiaryCountByGroup(),
     getBeneficiaryCountByGender: (req) => this.getBeneficiaryCountByGender(),
   };
@@ -39,13 +46,28 @@ module.exports = class extends AbstractController {
 
   async list(a, req) {
     // checkToken(req);
-    const list = await this.table.findAll({});
+    const list = await finderByProjectId(this.table, a, req);
+    // const list = await this.table.findAll({});
     return list;
   }
 
   async getById(id, req) {
     checkToken(req);
     return this.table.findByPk(id);
+  }
+
+  async updateExplorerTokenInfo(phone, payload, req) {
+    const { isClaimed, isOffline, tokenIssued } = payload;
+
+    const beneficiary = await this.table.findOne({ where: { phone } });
+
+    if (beneficiary) {
+      beneficiary.isClaimed = isClaimed;
+      beneficiary.isOffline = isOffline;
+      beneficiary.tokenIssued = tokenIssued;
+      beneficiary.save();
+    }
+    return beneficiary;
   }
 
   // reporting

@@ -10,8 +10,9 @@ const schema = {
   name: Sequelize.STRING,
   projectManager: Sequelize.STRING,
   location: Sequelize.STRING,
-  allocations: Sequelize.ARRAY(Sequelize.STRING),
+  // allocations: Sequelize.ARRAY(Sequelize.STRING),
   aidConnectActive: Sequelize.BOOLEAN,
+  status: Sequelize.STRING,
   financialInstitutions: Sequelize.ARRAY(Sequelize.JSON),
 };
 

@@ -13,6 +13,7 @@ const schema = {
   walletAddress: Sequelize.STRING,
   govtId: Sequelize.STRING,
   agencies: Sequelize.ARRAY(Sequelize.JSON),
+  projects: Sequelize.ARRAY(Sequelize.STRING),
 };
 
 module.exports = class extends AbstractModel {

@@ -56,10 +56,11 @@ class ContractListener extends EventEmitter {
           blockNumber: log.blockNumber,
           txHash: log.transactionHash,
           vendor,
-          phone: phone.toNumber(),
+          beneficiary: phone.toNumber(),
           amount: amount.toNumber(),
+          // TODO: add timestamp from blockchain
+          timestamp: Math.round(new Date().getTime() / 1000),
         };
-
         this.emit(EVENTS.TRANSACTION_ADDED, data);
       } catch (e) {
         console.log(e);

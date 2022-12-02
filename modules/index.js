@@ -1,5 +1,4 @@
 require("./services");
-const WSService = require("@rumsan/core/services/webSocket");
 const { AppSettings } = require("@rumsan/core");
 const TransactionsCacheClaimAcquiredERC20 = require("./cache_claimAcquiredERC20");
 const ContractListener = require("./_listeners/contractListeners");

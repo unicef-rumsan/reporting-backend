@@ -18,7 +18,8 @@ module.exports = class extends AbstractController {
   registrations = {
     getBeneficiaryCountByGroup: () => this.getBeneficiaryCountByGroup(),
     getBeneficiaryCountByGender: (req) => this.getBeneficiaryCountByGender(req),
-    getTransactionsCountByMethod: () => this.getTransactionsCountByMethod(),
+    getTransactionsCountByMethod: (req) =>
+      this.getTransactionsCountByMethod(req),
     getTransactionsCountByMode: (req) => this.getTransactionsCountByMode(req),
     getCountByWard: (req) => this.getCountByWard(req.query.year, req),
     getStackedGenderByWard: (req) => this.getStackedGenderByWard(req),
@@ -722,35 +723,50 @@ module.exports = class extends AbstractController {
 
   // online vs offline
 
-  async getTransactionsCountByMethod() {
+  async getTransactionsCountByMethod(req) {
     // ben table
-    let totalClaimed = await this.tblTxs.findAll({
-      where: {
-        method: {
-          [Op.not]: "unavailable",
-          // [Op.notIn]: ["unavailable", "undefined", "x", "", null],
+
+    let totalClaimedQR = await finderByProjectId(
+      this.tblBeneficiaries,
+      {
+        where: {
+          isQR: {
+            [Op.not]: null,
+          },
+          // isClaimed: true,
         },
+        // attributes: ["isQR", [this.db.Sequelize.fn("COUNT", "isQR"), "value"]],
+
+        // group: ["isQR"],
       },
-      attributes: [
-        "method",
-        [this.db.Sequelize.fn("COUNT", "method"), "value"],
-      ],
-      group: ["method"],
+      req
+    );
+
+    totalClaimedQR = JSON.parse(JSON.stringify(totalClaimedQR));
+
+    let itemGroup = groupBy("isQR")(totalClaimedQR);
+
+    let counts = Object.keys(itemGroup).map((key) => {
+      return itemGroup[key].reduce(
+        (acc, cur) => acc + parseInt(cur.tokenIssued),
+        0
+      );
     });
 
-    // total amount of  beneficiaries amount
-    //  total fake number *1000 (assigned)  claimed, calculated from ben table
-    totalClaimed = JSON.parse(JSON.stringify(totalClaimed));
-    const chartLabel = totalClaimed.map((item) => item.method);
+    let totalIssued = totalClaimedQR.length * 1000;
+
+    const chartLabel = Object.keys(itemGroup).map((key) =>
+      JSON.parse(key) ? "QR" : "SMS"
+    );
 
     const chartData = [
       {
         name: "Total Sent",
-        data: totalClaimed.map((item) => +item.value * 1.5),
+        data: [totalIssued, totalIssued],
       },
       {
         name: "Claimed",
-        data: totalClaimed.map((item) => +item.value),
+        data: counts,
       },
     ];
 

@@ -282,5 +282,5 @@ const scripts = {
   await scripts.getLogsFromExplorer();
   await scripts.getModifiedDecodedLogs();
   await scripts.updateMissingTransactionValue();
-  // await scripts.updateBeneficiaryClaimData();
+  await scripts.updateBeneficiaryClaimData();
 })();

@@ -41,9 +41,15 @@ const schema = {
   bankAccountNumber: Sequelize.STRING,
   mobilizer: Sequelize.STRING,
   ward: Sequelize.STRING,
-  isClaimed: Sequelize.BOOLEAN,
+  isClaimed: {
+    type: Sequelize.BOOLEAN,
+    defaultValue: false,
+  },
   isOffline: Sequelize.BOOLEAN,
-  tokenIssued: Sequelize.STRING,
+  tokenIssued: {
+    type: Sequelize.INTEGER,
+    defaultValue: 0,
+  },
   isQR: Sequelize.BOOLEAN,
   // total token Issued, claimed (claimed>= issued = isClaimed true) isIssued = boolean
   // claimedAmount, issuedAmount, date, issuerPhone, txHash(opt) -- issued table

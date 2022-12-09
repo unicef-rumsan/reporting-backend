@@ -36,6 +36,11 @@ const validators = {
     //   tokenIssued: Joi.number().required(),
     // }),
   },
+  getBeneficiaryByWard: {
+    query: Joi.object({
+      ward: Joi.string().required(),
+    }),
+  },
 };
 
 module.exports = class extends AbstractValidator {

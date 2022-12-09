@@ -24,6 +24,8 @@ module.exports = class extends AbstractController {
       ),
     getBeneficiaryCountByGroup: (req) => this.getBeneficiaryCountByGroup(),
     getBeneficiaryCountByGender: (req) => this.getBeneficiaryCountByGender(),
+    getBeneficiaryByWard: (req) =>
+      this.getBeneficiaryByWard(req.query.ward, req),
   };
 
   async add(payload, req) {
@@ -85,6 +87,17 @@ module.exports = class extends AbstractController {
       attributes: ["gender", [this.db.Sequelize.fn("COUNT", "group"), "count"]],
       group: ["gender"],
     });
+    return list;
+  }
+
+  async getBeneficiaryByWard(ward, req) {
+    const list = await finderByProjectId(
+      this.table,
+      {
+        where: { ward },
+      },
+      req
+    );
     return list;
   }
 };

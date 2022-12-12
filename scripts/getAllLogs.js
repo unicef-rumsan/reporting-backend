@@ -1,11 +1,5 @@
 const config = require("config");
 
-const urlConfig = {
-  serverUrl: "https://unicef-api.xa.rahat.io/api/v1",
-  explorerUrl: "https://explorer.rumsan.com/api",
-  updatedExplorerUrl: "https://explorer.esatya.io",
-  reportingUrl: "http://localhost:4900/api/v1",
-};
 const axios = require("axios");
 const ethers = require("ethers");
 
@@ -236,10 +230,6 @@ const scripts = {
             isOffline: transaction.isOffline,
           }
         );
-        // await new Promise((resolve) => setTimeout(resolve, 1000));
-
-        // await new Promise((resolve) => setTimeout(resolve, 1000));
-        // console.log("Updating token issue model");
 
         await axios.post(`${urlConfig.reportingUrl}/issued-tokens/add`, {
           issuerPhone: transaction.beneficiary,

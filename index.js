@@ -36,6 +36,7 @@ const server = new Hapi.Server({
         "report_token",
         "auth_signature",
         "data_signature",
+        "report_token",
         "h-captcha-response",
         "projectId",
       ],

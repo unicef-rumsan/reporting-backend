@@ -7,6 +7,7 @@ const _Vendors = require("./vendor");
 const _Projects = require("./project");
 const _Reporting = require("./reporting");
 const _IssuedTokens = require("./issued-tokens");
+const Misc = require("./misc");
 //const Tag = require("./tag");
 const { mailOtp } = require("./eventHandlers");
 const { EVENTS } = require("../constants/appConstants");
@@ -20,6 +21,7 @@ let Routes = {
   Projects: new _Projects(),
   Reporting: new _Reporting(),
   IssuedTokens: new _IssuedTokens(),
+  Misc: new Misc(),
 };
 
 ContractListener.on(EVENTS.TRANSACTION_ADDED, (data) => {

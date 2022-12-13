@@ -46,11 +46,13 @@ const schema = {
     defaultValue: false,
   },
   isOffline: Sequelize.BOOLEAN,
-  tokenIssued: {
+  totalTokenIssued: {
     type: Sequelize.INTEGER,
     defaultValue: 0,
   },
   isQR: Sequelize.BOOLEAN,
+  tokenBalance: Sequelize.INTEGER,
+  cashBalance: Sequelize.INTEGER,
   // total token Issued, claimed (claimed>= issued = isClaimed true) isIssued = boolean
   // claimedAmount, issuedAmount, date, issuerPhone, txHash(opt) -- issued table
 };

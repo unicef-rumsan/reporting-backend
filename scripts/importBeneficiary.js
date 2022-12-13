@@ -50,5 +50,5 @@ const script = {
 };
 
 (async () => {
-  await scripts.migrateBeneficiary();
+  await script.migrateBeneficiary();
 })();

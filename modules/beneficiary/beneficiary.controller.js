@@ -26,6 +26,8 @@ module.exports = class extends AbstractController {
     getBeneficiaryCountByGender: (req) => this.getBeneficiaryCountByGender(),
     getBeneficiaryByWard: (req) =>
       this.getBeneficiaryByWard(req.query.ward, req),
+    updateTokenInfo: (req) =>
+      this.updateTokenInfo(req.params.beneficiaryPhone, req.payload, req),
   };
 
   async add(payload, req) {
@@ -56,6 +58,21 @@ module.exports = class extends AbstractController {
   async getById(id, req) {
     checkToken(req);
     return this.table.findByPk(id);
+  }
+
+  async updateTokenInfo(beneficiaryPhone, payload, req) {
+    // checkToken(req);
+
+    const beneficiary = await this.table.findOne({
+      where: { phone: beneficiaryPhone },
+    });
+    if (beneficiary) {
+      beneficiary.cashBalance = payload.cashBalance;
+      beneficiary.tokenBalance = payload.tokenBalance;
+      beneficiary.totalTokenIssued = payload.totalTokenIssued;
+      beneficiary.save();
+    }
+    return beneficiary;
   }
 
   async updateExplorerTokenInfo(phone, payload, req) {

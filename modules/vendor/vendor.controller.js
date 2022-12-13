@@ -16,6 +16,8 @@ module.exports = class extends AbstractController {
     list: (req) => this.list(_, req),
     getById: (req) => this.getById(req.params.id, req),
     bulkAdd: (req) => this.bulkAdd(req.payload, req),
+    updateTokenInfo: (req) =>
+      this.updateTokenInfo(req.params.vendorId, req.payload, req),
   };
 
   async add(payload, req) {
@@ -49,5 +51,20 @@ module.exports = class extends AbstractController {
     checkToken(req);
 
     return this.table.findByPk(id);
+  }
+
+  async updateTokenInfo(vendorId, payload, req) {
+    // checkToken(req);
+
+    const vendor = await this.table.findByPk(vendorId);
+    if (!vendor) {
+      throw new Error("Vendor not found");
+    }
+    vendor.cashAllowance = payload.cashAllowance;
+    vendor.tokenBalance = payload.tokenBalance;
+    vendor.cashBalance = payload.cashBalance;
+    vendor.save();
+
+    return vendor;
   }
 };

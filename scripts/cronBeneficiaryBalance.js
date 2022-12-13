@@ -10,6 +10,8 @@ const scr = {
   },
 
   async projectBeneficiaries(params) {
+    console.log("Getting Beneficiaries");
+
     const { data } = await sourceApi.get("/reports/beneficiaries", {
       params,
     });
@@ -40,6 +42,8 @@ const scr = {
   async updateBeneficiaryBalance() {
     try {
       const balances = await scr.getBeneficiaryBalance();
+      console.log("Updating Project Balances");
+
       for (let balance of balances) {
         await reportApi.patch(
           `/beneficiaries/updateTokenInfo/${balance.beneficiary}`,

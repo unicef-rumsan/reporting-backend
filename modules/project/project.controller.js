@@ -15,6 +15,8 @@ module.exports = class extends AbstractController {
     list: (req) => this.list(_, req),
     getById: (req) => this.getById(req.params.id, req),
     bulkAdd: (req) => this.bulkAdd(req.payload, req),
+    updateTokenInfo: (req) =>
+      this.updateTokenInfo(req.params.projectId, req.payload, req),
   };
 
   async add(payload, req) {
@@ -44,5 +46,17 @@ module.exports = class extends AbstractController {
   async getById(id, req) {
     checkToken(req);
     return this.table.findByPk(id);
+  }
+
+  async updateTokenInfo(projectId, payload, req) {
+    // checkToken(req);
+    const project = await this.table.findByPk(projectId);
+    if (!project) {
+      throw new Error("Project not found");
+    }
+    project.balance = payload.balance;
+    // project.tokenInfo = payload.tokenInfo;
+    await project.save();
+    return project;
   }
 };

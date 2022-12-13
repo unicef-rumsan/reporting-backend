@@ -32,5 +32,10 @@ module.exports = class extends AbstractRouter {
       path: "/{id}",
       description: "Get vendor by id",
     },
+    updateTokenInfo: {
+      method: "PATCH",
+      path: "/updateTokenInfo/{vendorId}",
+      description: "Update token info",
+    },
   };
 };

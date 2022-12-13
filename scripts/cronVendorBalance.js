@@ -1,8 +1,9 @@
-const { scripts, sourceApi } = require("./_common");
-const { ethers } = require("ethers");
+const { scripts, sourceApi, reportApi } = require("./_common");
 
 const scr = {
   async getVendors() {
+    console.log("Getting Vendors");
+
     const { data } = await sourceApi.get("/reports/vendors");
     return data.map((el) => el.wallet_address);
   },
@@ -32,8 +33,24 @@ const scr = {
     });
     return balances;
   },
+
+  async updateVendorBalance() {
+    try {
+      const balances = await scr.getVendorBalance();
+      console.log("Updating Vendor Balances");
+
+      for (const balance of balances) {
+        await reportApi.patch(
+          `/vendors/updateTokenInfo/${balance.vendor}`,
+          balance
+        );
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  },
 };
 
 (async () => {
-  await scr.getVendorBalance();
+  await scr.updateVendorBalance();
 })();

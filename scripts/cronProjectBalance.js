@@ -18,7 +18,9 @@ const scr = {
   },
 
   async getProjectBalance() {
+    console.log("Getting Projects");
     const projects = await scr.getProjects();
+    console.log("Getting Project Balances");
     const balance = await scr.bulkBalance(projects);
     const rahatInterface = await scripts.interface("Rahat");
     const decodedData = balance.map((projId) =>
@@ -35,8 +37,24 @@ const scr = {
     });
     return balances;
   },
+
+  async updateProjectBalance() {
+    try {
+      const balances = await scr.getProjectBalance();
+      console.log("Updating Project Balances");
+
+      for (const balance of balances) {
+        await reportApi.patch(
+          `/projects/updateTokenInfo/${balance.project}`,
+          balance
+        );
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  },
 };
 
 (async () => {
-  await scr.getProjectBalance();
+  await scr.updateProjectBalance();
 })();

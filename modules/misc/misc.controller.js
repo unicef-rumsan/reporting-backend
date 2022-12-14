@@ -12,22 +12,23 @@ module.exports = class extends AbstractController {
   }
 
   registrations = {
-    add: (req) => this.add(req.payload.name, req.payload.value, req),
+    add: (req) => this.add(req.params.name, req.payload, req),
     getByName: (req) => this.getByName(req.params.name, req),
   };
 
   async add(name, value) {
     //checkToken(req);
-    try {
-      return this.table.create({ name, value });
-    } catch (err) {
-      console.log(err);
-    }
+    let rec = await this.table.findOne({ where: { name } });
+    if (rec) {
+      rec.set("value", value);
+      return rec.save();
+    } else return this.table.create({ name, value });
   }
 
   async getByName(name) {
     //checkToken(req);
 
-    return this.table.findOne({ where: { name } });
+    let rec = await this.table.findOne({ where: { name } });
+    return rec.value;
   }
 };

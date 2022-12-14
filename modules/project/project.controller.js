@@ -55,7 +55,10 @@ module.exports = class extends AbstractController {
       throw new Error("Project not found");
     }
     project.balance = payload.balance;
-    // project.tokenInfo = payload.tokenInfo;
+    project.totalBudget = payload.totalBudget;
+    project.cashAllowance = payload.cashAllowance;
+    project.cashBalance = payload.cashBalance;
+    project.tokenBalance = payload.tokenBalance;
     await project.save();
     return project;
   }

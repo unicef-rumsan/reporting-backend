@@ -8,10 +8,12 @@ const scr = {
   },
 
   async bulkBalance(projects) {
+    const contracts = await scripts.getAddresses();
     const abi = await scripts.getAbi("Rahat");
     const callData = projects.map((projId) =>
-      scripts.generateMultiCallData(abi, "remainingProjectErc20Balances", [
+      scripts.generateMultiCallData(abi, "projectBalance", [
         ethers.utils.id(projId),
+        contracts.rahat_admin,
       ])
     );
     return scripts.multicall.call(callData);
@@ -24,15 +26,16 @@ const scr = {
     const balance = await scr.bulkBalance(projects);
     const rahatInterface = await scripts.interface("Rahat");
     const decodedData = balance.map((projId) =>
-      rahatInterface.decodeFunctionResult(
-        "remainingProjectErc20Balances",
-        projId
-      )
+      rahatInterface.decodeFunctionResult("projectBalance", projId)
     );
     const balances = decodedData.map((el, i) => {
       return {
         project: projects[i],
         balance: el[0].toNumber(),
+        totalBudget: el.totalBudget.toNumber(),
+        cashAllowance: el.cashAllowance.toNumber(),
+        cashBalance: el.cashBalance.toNumber(),
+        tokenBalance: el.tokenBalance.toNumber(),
       };
     });
     return balances;

@@ -14,9 +14,18 @@ const schema = {
   govtId: Sequelize.STRING,
   agencies: Sequelize.ARRAY(Sequelize.JSON),
   projects: Sequelize.ARRAY(Sequelize.STRING),
-  cashAllowance: Sequelize.INTEGER,
-  tokenBalance: Sequelize.INTEGER,
-  cashBalance: Sequelize.INTEGER,
+  cashAllowance: {
+    type: Sequelize.INTEGER,
+    defaultValue: 0,
+  },
+  tokenBalance: {
+    type: Sequelize.INTEGER,
+    defaultValue: 0,
+  },
+  cashBalance: {
+    type: Sequelize.INTEGER,
+    defaultValue: 0,
+  },
 };
 
 module.exports = class extends AbstractModel {

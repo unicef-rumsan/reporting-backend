@@ -23,6 +23,8 @@ module.exports = class extends AbstractController {
     getTransactionsCountByMode: (req) => this.getTransactionsCountByMode(req),
     getCountByWard: (req) => this.getCountByWard(req.query.year, req),
     countGenderByWard: (req) => this.countGenderByWard(req.query.ward),
+    groupClaimDistributionByWard: (req) =>
+      this.groupClaimDistributionByWard(req.query.ward, req.headers.projectId),
     groupWardByGender: (req) => this.groupWardByGender(req.query.ward, req),
     groupWardByClaim: (req) => this.groupWardByClaim(req.query.ward, req),
     groupWardByLandOwnership: (req) =>
@@ -32,8 +34,6 @@ module.exports = class extends AbstractController {
     getBeneficiariesCounts: (req) => this.getBeneficiariesCounts(null, req),
     getBeneficiaryGroupingData: (req) =>
       this.getBeneficiaryGroupingData(null, req),
-    groupClaimDistributionByWard: (req) =>
-      this.groupClaimDistributionByWard(req),
   };
 
   // reporting
@@ -114,20 +114,21 @@ module.exports = class extends AbstractController {
     });
     return grp;
   }
-  async getClaimCountByWard(req) {
+
+  async groupClaimDistributionByWard(ward, projectId) {
     let list = await finderByProjectId(
       this.tblBeneficiaries,
       {
         where: {
-          ward: {
+          ward: ward || {
             [Op.ne]: null,
           },
         },
         attributes: [
           "ward",
           [this.db.Sequelize.fn("COUNT", "ward"), "count"],
-          "isClaimed",
 
+          "isClaimed",
           [this.db.Sequelize.fn("COUNT", "isClaimed"), "claimedCount"],
           // "year",
         ],
@@ -143,48 +144,25 @@ module.exports = class extends AbstractController {
           // "year"
         ],
       },
-      req.headers.projectId
+      projectId
     );
+
+    list = list.sort((a, b) => parseInt(a.ward) - parseInt(b.ward));
+
     list = JSON.parse(JSON.stringify(list));
 
-    let itemGroup = groupBy("isClaimed")(list);
+    let itemGroup = groupBy("ward")(list);
 
-    // let wardGroup = groupBy("ward")(list);
-
-    // let d = Object.keys(wardGroup).map((key) => {
-    //   return wardGroup[key]
-    // });
-    // console.log("d", d);
-
-    let chartData = Object.keys(itemGroup).map((key) => {
-      let claimCount = itemGroup[key].map((i) => i.claimedCount);
-      // let notClaimCount = itemGroup[key].map((i) =>
-      //   !i.isClaimed ? i.claimedCount : 0
-      // );
-      // console.log("claimCOuntclaimCount", itemGroup[key]);
+    let grp = Object.keys(itemGroup).map((key) => {
       return {
-        name:
-          key !== "null"
-            ? key === "false"
-              ? "Not Claimed"
-              : "Claimed"
-            : "Unknown",
-        data: [claimCount],
+        ward: key,
+        claimed: itemGroup[key].find((d) => d.isClaimed === true)?.count || 0,
+        notClaimed:
+          itemGroup[key].find((d) => d.isClaimed === false)?.count || 0,
       };
     });
 
-    const chartLabel = Object.keys(itemGroup)
-      .map((key) => {
-        return itemGroup[key].map((i) => `Ward ${i.ward}` ?? "Unavailable");
-      })
-      .flat();
-
-    const data = {
-      chartLabel: [...new Set(chartLabel)],
-      chartData,
-    };
-
-    return data;
+    return grp;
   }
 
   // group ward by gender
@@ -794,21 +772,5 @@ module.exports = class extends AbstractController {
       hasBank,
       hasPhone,
     };
-  }
-
-  async groupClaimDistributionByWard(req) {
-    let list = await finderByProjectId(
-      this.tblBeneficiaries,
-      {
-        where: {},
-        attributes: ["ward", [this.db.Sequelize.fn("COUNT", "ward"), "count"]],
-        group: ["ward"],
-      },
-      req
-    );
-    list = JSON.parse(JSON.stringify(list));
-
-    let itemGroup = groupBy("isClaimed")(list);
-    console.log("list", itemGroup);
   }
 };

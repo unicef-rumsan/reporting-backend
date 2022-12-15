@@ -33,10 +33,10 @@ module.exports = class extends AbstractRouter {
      * Real TIme Reports
      */
 
-    getClaimCountByWard: {
+    groupClaimDistributionByWard: {
       method: "GET",
-      path: "/real-time/transactions/count-by-ward",
-      description: "Get Transactions count by ward",
+      path: "/beneficiary/claim-distribution-by-ward",
+      description: "Get Benenneficiary claim count by ward",
     },
     groupWardByGender: {
       method: "GET",
@@ -83,11 +83,6 @@ module.exports = class extends AbstractRouter {
       method: "GET",
       path: "/end-of-day/beneficiary/grouping-data",
       description: "Get Impacted Beneficiaries",
-    },
-
-    groupClaimDistributionByWard: {
-      method: "GET",
-      path: "/beneficiary/claim-distribution-by-ward",
     },
   };
 };

@@ -30,11 +30,12 @@ module.exports = class extends AbstractController {
 
   async bulkAdd(payload, req) {
     checkToken(req);
-    const projects = await this.table.findAll({});
-    const filtered = getDifferentObject(payload, projects, "name");
+    // const projects = await this.table.findAll({});
+    // const filtered = getDifferentObject(payload, projects, "name");
 
     try {
-      return this.table.bulkCreate(filtered);
+      await this.table.destroy({ truncate: true });
+      return this.table.bulkCreate(payload);
     } catch (err) {
       console.log(err);
     }

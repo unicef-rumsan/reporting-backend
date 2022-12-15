@@ -68,6 +68,11 @@ module.exports = class extends AbstractRouter {
       path: "/real-time/beneficiary/group-ward-disability",
       description: "Get Beneficiary count by disability",
     },
+    groupWardByDailyWage: {
+      method: "GET",
+      path: "/real-time/beneficiary/group-ward-dailywage",
+      description: "Get Beneficiary count by daily wage",
+    },
 
     getBeneficiariesCounts: {
       method: "GET",

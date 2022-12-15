@@ -31,6 +31,8 @@ module.exports = class extends AbstractController {
       this.groupWardByLandOwnership(req.query.ward, req),
     groupWardByDisability: (req) =>
       this.groupWardByDisability(req.query.ward, req),
+    groupWardByDailyWage: (req) =>
+      this.groupWardByDailyWage(req.query.ward, req),
     getBeneficiariesCounts: (req) => this.getBeneficiariesCounts(null, req),
     getBeneficiaryGroupingData: (req) =>
       this.getBeneficiaryGroupingData(null, req),
@@ -130,19 +132,9 @@ module.exports = class extends AbstractController {
 
           "isClaimed",
           [this.db.Sequelize.fn("COUNT", "isClaimed"), "claimedCount"],
-          // "year",
         ],
 
-        // order: [
-        //   ["ward", "ASC"],
-        //   ["isClaimed", "ASC"],
-        // ],
-
-        group: [
-          "ward",
-          "isClaimed",
-          // "year"
-        ],
+        group: ["ward", "isClaimed"],
       },
       projectId
     );
@@ -211,6 +203,26 @@ module.exports = class extends AbstractController {
     let genderGroupList = await this._groupWardByKey(ward, "noLand", req);
     const chartLabel = genderGroupList.list.map((item) =>
       item.noLand !== null ? (item.noLand ? "No Land" : "Land") : "Unknown"
+    );
+    const chartValues = genderGroupList.list.map((item) => item.count);
+    const data = {
+      // allAvailableYears: yearList,
+      chartLabel,
+      chartData: [
+        {
+          // year,
+          name: "count",
+          data: chartValues,
+        },
+      ],
+    };
+
+    return data;
+  }
+  async groupWardByDailyWage(ward, req) {
+    let genderGroupList = await this._groupWardByKey(ward, "dailyWage", req);
+    const chartLabel = genderGroupList.list.map((item) =>
+      item.noLand !== null ? (item.dailyWage ? "No" : "Yes") : "Unknown"
     );
     const chartValues = genderGroupList.list.map((item) => item.count);
     const data = {

@@ -22,7 +22,7 @@ module.exports = class extends AbstractController {
       this.getTransactionsCountByMethod(req),
     getTransactionsCountByMode: (req) => this.getTransactionsCountByMode(req),
     getCountByWard: (req) => this.getCountByWard(req.query.year, req),
-    getStackedGenderByWard: (req) => this.getStackedGenderByWard(req),
+    countGenderByWard: (req) => this.countGenderByWard(req.query.ward),
     groupWardByGender: (req) => this.groupWardByGender(req.query.ward, req),
     groupWardByClaim: (req) => this.groupWardByClaim(req.query.ward, req),
     groupWardByLandOwnership: (req) =>
@@ -54,7 +54,7 @@ module.exports = class extends AbstractController {
         ],
         group: ["isOffline"],
       },
-      req
+      req.headers.projectId
     );
 
     list = JSON.parse(JSON.stringify(list));
@@ -76,12 +76,12 @@ module.exports = class extends AbstractController {
    * Real Time Reports
    */
 
-  async getStackedGenderByWard(req) {
+  async countGenderByWard(ward, projectId) {
     let list = await finderByProjectId(
       this.tblBeneficiaries,
       {
         where: {
-          ward: {
+          ward: ward || {
             [Op.ne]: null,
           },
         },
@@ -92,45 +92,25 @@ module.exports = class extends AbstractController {
           [this.db.Sequelize.fn("COUNT", "gender"), "genderCount"],
         ],
 
-        order: [
-          ["ward", "ASC"],
-          // ["gender", "ASC"],
-        ],
-
         group: ["ward", "gender"],
+        raw: true,
       },
-      req
+      projectId
     );
 
-    list = JSON.parse(JSON.stringify(list));
+    list = list.sort((a, b) => parseInt(a.ward) - parseInt(b.ward));
 
-    let itemGroup = groupBy("gender")(list);
-
+    let itemGroup = groupBy("ward")(list);
     let grp = Object.keys(itemGroup).map((key) => {
       return {
-        name: key,
-        data: itemGroup[key].map((i) => i.genderCount),
+        ward: key,
+        male: itemGroup[key].find((d) => d.gender === "M")?.count || 0,
+        female: itemGroup[key].find((d) => d.gender === "F")?.count || 0,
+        other: itemGroup[key].find((d) => d.gender === "O")?.count || 0,
+        unknown: itemGroup[key].find((d) => d.gender === "U")?.count || 0,
       };
     });
-
-    const chartLabel = list.map((item) => `Ward ${item.ward}` ?? "Unavailable");
-    // const chartValues = list.map((item) => +item.count);
-
-    // console.log("item", JSON.stringify(item, null, 2));
-    const data = {
-      // allAvailableYears: yearList,
-      chartLabel: [...new Set(chartLabel)],
-      chartData: grp,
-      // chartData: [
-      //   {
-      //     // year,
-      //     name: "count",
-      //     data: chartValues,
-      //   },
-      // ],
-    };
-
-    return data;
+    return grp;
   }
   async getCountByWard(year, req) {
     let list = await finderByProjectId(
@@ -160,7 +140,7 @@ module.exports = class extends AbstractController {
           // "year"
         ],
       },
-      req
+      req.headers.projectId
     );
     list = JSON.parse(JSON.stringify(list));
 
@@ -203,7 +183,7 @@ module.exports = class extends AbstractController {
         ],
         group: [groupKey],
       },
-      req
+      req.headers.projectId
     );
     list = JSON.parse(JSON.stringify(list));
     return {
@@ -310,7 +290,7 @@ module.exports = class extends AbstractController {
         ],
         group: ["gender"],
       },
-      req
+      req.headers.projectId
     );
 
     return list;
@@ -329,7 +309,7 @@ module.exports = class extends AbstractController {
         ],
         group: ["isClaimed"],
       },
-      req
+      req.headers.projectId
     );
 
     list = JSON.parse(JSON.stringify(list))[0];
@@ -375,7 +355,7 @@ module.exports = class extends AbstractController {
           "below5_other",
         ],
       },
-      req
+      req.headers.projectId
     );
     list = JSON.parse(JSON.stringify(list));
     const totalFamilyCount = list.reduce(
@@ -461,7 +441,7 @@ module.exports = class extends AbstractController {
           // ],
         ],
       },
-      req
+      req.headers.projectId
     );
 
     list = JSON.parse(JSON.stringify(list))[0];
@@ -490,7 +470,7 @@ module.exports = class extends AbstractController {
         ],
         group: ["noLand"],
       },
-      req
+      req.headers.projectId
     );
 
     list = JSON.parse(JSON.stringify(list));
@@ -516,7 +496,7 @@ module.exports = class extends AbstractController {
         ],
         group: ["disability"],
       },
-      req
+      req.headers.projectId
     );
 
     list = JSON.parse(JSON.stringify(list));
@@ -546,7 +526,7 @@ module.exports = class extends AbstractController {
         ],
         group: ["dailyWage"],
       },
-      req
+      req.headers.projectId
     );
     list = JSON.parse(JSON.stringify(list));
 
@@ -604,7 +584,7 @@ module.exports = class extends AbstractController {
         ],
         group: ["hasBank"],
       },
-      req
+      req.headers.projectId
     );
 
     list = JSON.parse(JSON.stringify(list));
@@ -633,7 +613,7 @@ module.exports = class extends AbstractController {
         ],
         group: ["hasPhone"],
       },
-      req
+      req.headers.projectId
     );
 
     list = JSON.parse(JSON.stringify(list));
@@ -702,7 +682,7 @@ module.exports = class extends AbstractController {
           // ],
         ],
       },
-      req
+      req.headers.projectId
     );
 
     list = JSON.parse(JSON.stringify(list))[0];
@@ -739,7 +719,7 @@ module.exports = class extends AbstractController {
 
         // group: ["isQR"],
       },
-      req
+      req.headers.projectId
     );
 
     totalClaimedQR = JSON.parse(JSON.stringify(totalClaimedQR));

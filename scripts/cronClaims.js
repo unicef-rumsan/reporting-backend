@@ -119,20 +119,20 @@ const claims = {
           id: tx?.id,
           txHash: tx.txHash,
           beneficiary: tx.beneficiary,
-          method: log.extras
-            ? log.extras?.isPhone
-              ? "sms"
-              : "qr"
-            : "unavailable",
-          mode: log.extras
-            ? log.extras?.isOffline
-              ? "offline"
-              : "online"
-            : "unavailable",
+          // method: log.extras
+          //   ? log.extras?.isPhone
+          //     ? "sms"
+          //     : "qr"
+          //   : "unavailable",
+          // mode: log.extras
+          //   ? log.extras?.isOffline
+          //     ? "offline"
+          //     : "online"
+          //   : "unavailable",
           isOffline: log.extras?.isOffline,
           ward: log.extras ? log.extras?.ward : 0,
-          isClaimed: log.extras?.isClaimed,
-          tokenIssued: log.extras?.tokenIssued,
+          // isClaimed: log.extras?.isClaimed,
+          // tokenIssued: log.extras?.tokenIssued,
         };
       });
 

@@ -1,6 +1,7 @@
 const { AbstractController } = require("@rumsan/core/abstract");
 const WSService = require("@rumsan/core/services/webSocket");
 const checkToken = require("../../helpers/utils/checkToken");
+const getDifferentObject = require("../../helpers/utils/getDifferentObject");
 const { finderByProjectId } = require("../../helpers/utils/projectFinder");
 const { BeneficiaryModel } = require("../models");
 
@@ -40,9 +41,11 @@ module.exports = class extends AbstractController {
   }
 
   async bulkAdd(payload, req) {
+    const beneficiaries = await this.table.findAll({});
+    const filtered = getDifferentObject(payload, beneficiaries, "phone");
     // checkToken(req);
     try {
-      return this.table.bulkCreate(payload);
+      return this.table.bulkCreate(filtered);
     } catch (err) {
       console.log(err);
     }

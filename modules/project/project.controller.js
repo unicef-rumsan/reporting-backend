@@ -30,8 +30,11 @@ module.exports = class extends AbstractController {
 
   async bulkAdd(payload, req) {
     checkToken(req);
+    const projects = await this.table.findAll({});
+    const filtered = getDifferentObject(payload, projects, "name");
+
     try {
-      return this.table.bulkCreate(payload);
+      return this.table.bulkCreate(filtered);
     } catch (err) {
       console.log(err);
     }
@@ -54,7 +57,6 @@ module.exports = class extends AbstractController {
     if (!project) {
       throw new Error("Project not found");
     }
-    project.balance = payload.balance;
     project.totalBudget = payload.totalBudget;
     project.cashAllowance = payload.cashAllowance;
     project.cashBalance = payload.cashBalance;

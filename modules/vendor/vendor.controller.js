@@ -34,7 +34,10 @@ module.exports = class extends AbstractController {
     checkToken(req);
 
     try {
-      return this.table.bulkCreate(payload);
+      const vendors = await this.table.findAll({});
+      const filtered = getDifferentObject(payload, vendors, "name");
+
+      return this.table.bulkCreate(filtered);
     } catch (err) {
       console.log(err);
     }

@@ -20,7 +20,7 @@ const scr = {
 
   async getBeneficiaryBalance() {
     let { phones } = await scr.projectBeneficiaries();
-    phones = phones.slice(0, 10);
+    // phones = phones.slice(0, 10);
     const balance = await scr.bulkBalance(phones);
     const rahatInterface = await scripts.interface("Rahat");
     const decodedData = balance.map((phones) =>
@@ -42,7 +42,7 @@ const scr = {
   async updateBeneficiaryBalance() {
     try {
       const balances = await scr.getBeneficiaryBalance();
-      console.log("Updating Project Balances");
+      console.log("Updating Beneficiary Balances");
 
       for (let balance of balances) {
         await reportApi.patch(

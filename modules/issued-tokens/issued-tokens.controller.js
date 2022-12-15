@@ -1,5 +1,4 @@
 const { AbstractController } = require("@rumsan/core/abstract");
-const { finderByProjectId } = require("../../helpers/utils/projectFinder");
 const { IssuedTokensModel } = require("../models");
 
 module.exports = class extends AbstractController {

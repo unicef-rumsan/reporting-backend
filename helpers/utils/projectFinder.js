@@ -6,11 +6,11 @@ const { Op } = require("sequelize");
  * @param {object} req
  *
  */
-async function finderByProjectId(table, query, req) {
-  let projectsQuery = req.headers.projectid
+async function finderByProjectId(table, query, projectid) {
+  let projectsQuery = projectid
     ? {
         projects: {
-          [Op.contains]: [req.headers.projectid],
+          [Op.contains]: [projectid],
         },
       }
     : {};

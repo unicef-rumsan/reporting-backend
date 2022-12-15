@@ -14,11 +14,22 @@ const schema = {
   aidConnectActive: Sequelize.BOOLEAN,
   status: Sequelize.STRING,
   financialInstitutions: Sequelize.ARRAY(Sequelize.JSON),
-  balance: Sequelize.FLOAT,
-  totalBudget: Sequelize.FLOAT,
-  cashAllowance: Sequelize.FLOAT,
-  cashBalance: Sequelize.FLOAT,
-  tokenBalance: Sequelize.FLOAT,
+  totalBudget: {
+    type: Sequelize.INTEGER,
+    defaultValue: 0,
+  },
+  cashAllowance: {
+    type: Sequelize.INTEGER,
+    defaultValue: 0,
+  },
+  tokenBalance: {
+    type: Sequelize.INTEGER,
+    defaultValue: 0,
+  },
+  cashBalance: {
+    type: Sequelize.INTEGER,
+    defaultValue: 0,
+  },
 };
 
 module.exports = class extends AbstractModel {

@@ -11,7 +11,7 @@ module.exports = class extends AbstractRouter {
   routes = {
     add: {
       method: "POST",
-      path: "",
+      path: "/{name}",
       description: "Add new data",
     },
     getByName: {

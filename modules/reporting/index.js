@@ -48,9 +48,9 @@ module.exports = class extends AbstractRouter {
       path: "/real-time/beneficiary/count-by-gender",
       description: "Get Beneficiary count by gender",
     },
-    getStackedGenderByWard: {
+    countGenderByWard: {
       method: "GET",
-      path: "/real-time/beneficiary/stacked-ward-gender",
+      path: "/real-time/beneficiary/count-gender-ward",
       description: "Get Beneficiary count by gender",
     },
     groupWardByClaim: {

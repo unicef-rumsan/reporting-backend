@@ -53,7 +53,7 @@ module.exports = class extends AbstractController {
 
   async list(a, req) {
     // checkToken(req);
-    const list = await finderByProjectId(this.table, a, req);
+    const list = await finderByProjectId(this.table, a, req.headers.projectId);
     // const list = await this.table.findAll({});
     return list;
   }
@@ -116,7 +116,7 @@ module.exports = class extends AbstractController {
       {
         where: { ward },
       },
-      req
+      req.headers.projectId
     );
     return list;
   }

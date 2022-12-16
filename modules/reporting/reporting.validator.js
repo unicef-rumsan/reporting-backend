@@ -22,6 +22,16 @@ const validators = {
       ward: Joi.string().required(),
     }),
   },
+
+  //#region Demographic Reports
+
+  getLandOwnerDemographicData: {
+    query: Joi.object({
+      ward: Joi.string(),
+      filterKey: Joi.string().required(),
+    }),
+  },
+  // #endregion
 };
 
 module.exports = class extends AbstractValidator {

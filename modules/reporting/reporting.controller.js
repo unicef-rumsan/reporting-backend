@@ -36,6 +36,17 @@ module.exports = class extends AbstractController {
     getBeneficiariesCounts: (req) => this.getBeneficiariesCounts(null, req),
     getBeneficiaryGroupingData: (req) =>
       this.getBeneficiaryGroupingData(null, req),
+
+    //#region Demographic reports
+
+    getLandOwnerDemographicData: (req) =>
+      this.getLandOwnerDemographicData(
+        req.query.ward,
+        req.query.filterKey,
+        req.headers.projectId
+      ),
+
+    // #endregion
   };
 
   // reporting
@@ -785,4 +796,54 @@ module.exports = class extends AbstractController {
       hasPhone,
     };
   }
+
+  // #region demographic reports
+
+  async _wardGraphStack(ward, filterKey, projectId) {
+    let list = await finderByProjectId(
+      this.tblBeneficiaries,
+      {
+        where: {
+          ward: ward || {
+            [Op.ne]: null,
+          },
+        },
+        attributes: [
+          "ward",
+          [this.db.Sequelize.fn("COUNT", "ward"), "count"],
+
+          filterKey,
+          [this.db.Sequelize.fn("COUNT", filterKey), `${filterKey}Count`],
+        ],
+
+        group: ["ward", filterKey],
+      },
+      projectId
+    );
+
+    list = list.sort((a, b) => parseInt(a.ward) - parseInt(b.ward));
+
+    list = JSON.parse(JSON.stringify(list));
+
+    let itemGroup = groupBy("ward")(list);
+
+    return Object.keys(itemGroup).map((key) => {
+      return {
+        ward: key,
+        [`no${filterKey}`]:
+          itemGroup[key].find((d) => d[filterKey] === true)?.count || 0,
+        [filterKey]:
+          itemGroup[key].find((d) => d[filterKey] === false)?.count || 0,
+      };
+    });
+  }
+
+  async getLandOwnerDemographicData(ward, filterKey, projectId) {
+    // filterKey = filterKey || "noLand";
+    const data = await this._wardGraphStack(ward, filterKey, projectId);
+
+    return data;
+  }
+
+  // #endregion
 };

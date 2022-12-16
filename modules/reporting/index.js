@@ -89,5 +89,13 @@ module.exports = class extends AbstractRouter {
       path: "/end-of-day/beneficiary/grouping-data",
       description: "Get Impacted Beneficiaries",
     },
+
+    // #region Demographic
+    getLandOwnerDemographicData: {
+      method: "GET",
+      path: "/demographic/ward",
+      description: "Get Land Owner Demographic Data",
+    },
+    // #endregion
   };
 };

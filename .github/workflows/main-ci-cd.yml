@@ -1,12 +1,12 @@
-name: Stage CI/CD
+name: main CI/CD
 on:
   push:
     branches:
-      - "stage"
+      - "main"
 
   pull_request:
     branches:
-      - "stage"
+      - "main"
 
 jobs:  
   deploy:
@@ -17,7 +17,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          ref: stage
+          ref: main
 
       - name: setup docker buildx
         uses: docker/setup-buildx-action@v2
@@ -35,4 +35,4 @@ jobs:
           context: .
           file: Dockerfile
           push: true
-          tags: esatya/unicef_rahat_reporting_backend:stage
+          tags: esatya/unicef_rahat_reporting_backend:prod

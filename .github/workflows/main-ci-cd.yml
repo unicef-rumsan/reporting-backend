@@ -1,0 +1,38 @@
+name: Stage CI/CD
+on:
+  push:
+    branches:
+      - "stage"
+
+  pull_request:
+    branches:
+      - "stage"
+
+jobs:  
+  deploy:
+    name: build docker image and push to docker hub
+    runs-on: ubuntu-latest
+    # needs: build-coverage
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: stage
+
+      - name: setup docker buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: docker login
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PAT }}
+
+      - name: build and push api
+        id: build-push-api
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: Dockerfile
+          push: true
+          tags: esatya/unicef_rahat_reporting_backend:stage

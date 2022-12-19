@@ -60,7 +60,7 @@ module.exports = class extends AbstractController {
   }
 
   async getTransactionsCountByMode(req) {
-    let list = await finderByProjectId(
+    let { rows: list } = await finderByProjectId(
       this.tblBeneficiaries,
       {
         attributes: [
@@ -92,7 +92,7 @@ module.exports = class extends AbstractController {
    */
 
   async countGenderByWard(ward, projectId) {
-    let list = await finderByProjectId(
+    let { rows: list } = await finderByProjectId(
       this.tblBeneficiaries,
       {
         where: {
@@ -129,7 +129,7 @@ module.exports = class extends AbstractController {
   }
 
   async groupClaimDistributionByWard(ward, projectId) {
-    let list = await finderByProjectId(
+    let { rows: list } = await finderByProjectId(
       this.tblBeneficiaries,
       {
         where: {
@@ -171,7 +171,7 @@ module.exports = class extends AbstractController {
   // group ward by gender
   async _groupWardByKey(ward, groupKey, req) {
     groupKey = groupKey ?? "gender";
-    let list = await finderByProjectId(
+    let { rows: list } = await finderByProjectId(
       this.tblBeneficiaries,
       {
         where: {
@@ -301,7 +301,7 @@ module.exports = class extends AbstractController {
   }
 
   async getBeneficiaryCountByGender(req) {
-    const list = await finderByProjectId(
+    const { rows: list } = await finderByProjectId(
       this.tblBeneficiaries,
       {
         attributes: [
@@ -317,7 +317,7 @@ module.exports = class extends AbstractController {
   }
 
   async _getClaimedBeneficiaryCount(req) {
-    let list = await finderByProjectId(
+    let { rows: list } = await finderByProjectId(
       this.tblBeneficiaries,
       {
         where: {
@@ -337,7 +337,7 @@ module.exports = class extends AbstractController {
   }
 
   async getBeneficiariesCounts(_, req) {
-    let list = await finderByProjectId(
+    let { rows: list } = await finderByProjectId(
       this.tblBeneficiaries,
       {
         attributes: [
@@ -415,7 +415,7 @@ module.exports = class extends AbstractController {
   }
 
   async _groupByAgeRange(_, req) {
-    let list = await finderByProjectId(
+    let { rows: list } = await finderByProjectId(
       this.tblBeneficiaries,
       {
         where: {
@@ -481,7 +481,7 @@ module.exports = class extends AbstractController {
   }
 
   async _groupByLandOwner(_, req) {
-    let list = await finderByProjectId(
+    let { rows: list } = await finderByProjectId(
       this.tblBeneficiaries,
       {
         attributes: [
@@ -507,7 +507,7 @@ module.exports = class extends AbstractController {
   }
 
   async _groupByDisability(_, req) {
-    let list = await finderByProjectId(
+    let { rows: list } = await finderByProjectId(
       this.tblBeneficiaries,
       {
         attributes: [
@@ -537,7 +537,7 @@ module.exports = class extends AbstractController {
   }
 
   async _groupByDailyWage(_, req) {
-    let list = await finderByProjectId(
+    let { rows: list } = await finderByProjectId(
       this.tblBeneficiaries,
       {
         attributes: [
@@ -566,7 +566,7 @@ module.exports = class extends AbstractController {
   }
 
   // async _groupByPhoneOwnership(_, req) {
-  //   let list = await finderByProjectId(
+  //   let { rows: list } = await finderByProjectId(
   //     this.tblBeneficiaries,
   //     {
   //       attributes: [
@@ -595,7 +595,7 @@ module.exports = class extends AbstractController {
   // }
 
   async _groupByHasBank(_, req) {
-    let list = await finderByProjectId(
+    let { rows: list } = await finderByProjectId(
       this.tblBeneficiaries,
       {
         attributes: [
@@ -624,7 +624,7 @@ module.exports = class extends AbstractController {
     return list;
   }
   async _groupByHasPhone(_, req) {
-    let list = await finderByProjectId(
+    let { rows: list } = await finderByProjectId(
       this.tblBeneficiaries,
       {
         attributes: [
@@ -658,7 +658,7 @@ module.exports = class extends AbstractController {
    */
 
   async _groupByChildrenUnder5(_, req) {
-    let list = await finderByProjectId(
+    let { rows: list } = await finderByProjectId(
       this.tblBeneficiaries,
       {
         where: {
@@ -726,7 +726,7 @@ module.exports = class extends AbstractController {
   async getTransactionsCountByMethod(req) {
     // ben table
 
-    let totalClaimedQR = await finderByProjectId(
+    let { rows: totalClaimedQR } = await finderByProjectId(
       this.tblBeneficiaries,
       {
         where: {
@@ -800,7 +800,7 @@ module.exports = class extends AbstractController {
   // #region demographic reports
 
   async _wardGraphStack(ward, filterKey, projectId) {
-    let list = await finderByProjectId(
+    let { rows: list } = await finderByProjectId(
       this.tblBeneficiaries,
       {
         where: {

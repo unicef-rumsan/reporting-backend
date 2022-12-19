@@ -24,9 +24,14 @@ async function finderByProjectId(table, query, projectid) {
         }
       : projectsQuery,
   };
+  console.log("query", query);
 
-  const list = await table.findAll(query);
-  return list;
+  const { count, rows } = await table.findAndCountAll(query);
+
+  return {
+    rows,
+    count,
+  };
 }
 
 module.exports = { finderByProjectId };

@@ -14,7 +14,7 @@ module.exports = class extends AbstractController {
 
   registrations = {
     add: (req) => this.add(req.payload, req),
-    list: (req) => this.list(req.query, req),
+    list: (req) => this.list(req.query, req.headers.projectId),
     getById: (req) => this.getById(req.params.id, req),
     bulkAdd: (req) => this.bulkAdd(req.payload, req),
     updateExplorerTokenInfo: (req) =>
@@ -52,11 +52,28 @@ module.exports = class extends AbstractController {
     }
   }
 
-  async list(a, req) {
+  async list(query, projectId) {
+    const { limit, start, ...restQuery } = query;
     // checkToken(req);
-    const list = await finderByProjectId(this.table, a, req.headers.projectId);
+    console.log("query", query);
+    let { rows: list, count } = await finderByProjectId(
+      this.table,
+      {
+        where: { ...restQuery },
+        limit: limit || 100,
+        offset: start || 0,
+      },
+      projectId
+    );
+    list = JSON.parse(JSON.stringify(list));
     // const list = await this.table.findAll({});
-    return list;
+    return {
+      data: list,
+      count,
+      limit,
+      start,
+      totalPage: Math.ceil(count / limit),
+    };
   }
 
   async getById(id, req) {

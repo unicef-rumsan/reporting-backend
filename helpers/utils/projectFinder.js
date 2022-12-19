@@ -24,7 +24,6 @@ async function finderByProjectId(table, query, projectid) {
         }
       : projectsQuery,
   };
-  console.log("query", query);
 
   const { count, rows } = await table.findAndCountAll(query);
 

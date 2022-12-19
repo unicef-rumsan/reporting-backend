@@ -3,6 +3,7 @@ const { AbstractController } = require("@rumsan/core/abstract");
 const WSService = require("@rumsan/core/services/webSocket");
 const { VendorModel } = require("../models");
 const checkToken = require("../../helpers/utils/checkToken");
+const { finderByProjectId } = require("../../helpers/utils/projectFinder");
 
 module.exports = class extends AbstractController {
   constructor(options) {
@@ -13,7 +14,7 @@ module.exports = class extends AbstractController {
 
   registrations = {
     add: (req) => this.add(req.payload, req),
-    list: (req) => this.list(_, req),
+    list: (req) => this.list(req.query, req.headers.projectId),
     getById: (req) => this.getById(req.params.id, req),
     bulkAdd: (req) => this.bulkAdd(req.payload, req),
     updateTokenInfo: (req) =>
@@ -43,11 +44,25 @@ module.exports = class extends AbstractController {
     }
   }
 
-  async list(_, req) {
+  async list(query, projectId) {
+    const { limit, start, ...restQuery } = query;
     // checkToken(req);
-
-    const list = await this.table.findAll({});
-    return list;
+    let { rows: list, count } = await finderByProjectId(
+      this.table,
+      {
+        where: { ...restQuery },
+        limit: limit || 100,
+        offset: start || 0,
+      },
+      projectId
+    );
+    return {
+      data: list,
+      count,
+      limit,
+      start,
+      totalPage: Math.ceil(count / limit),
+    };
   }
 
   async getById(id, req) {
@@ -66,6 +81,7 @@ module.exports = class extends AbstractController {
     vendor.cashAllowance = payload.cashAllowance;
     vendor.tokenBalance = payload.tokenBalance;
     vendor.cashBalance = payload.cashBalance;
+    vendor.hasVendorRole = payload.hasVendorRole;
     vendor.save();
 
     return vendor;

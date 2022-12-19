@@ -26,6 +26,10 @@ const schema = {
     type: Sequelize.INTEGER,
     defaultValue: 0,
   },
+  hasVendorRole: {
+    type: Sequelize.BOOLEAN,
+    defaultValue: false,
+  },
 };
 
 module.exports = class extends AbstractModel {

@@ -81,6 +81,7 @@ module.exports = class extends AbstractController {
     vendor.cashAllowance = payload.cashAllowance;
     vendor.tokenBalance = payload.tokenBalance;
     vendor.cashBalance = payload.cashBalance;
+    vendor.hasVendorRole = payload.hasVendorRole;
     vendor.save();
 
     return vendor;

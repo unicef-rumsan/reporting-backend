@@ -41,6 +41,7 @@ const schema = {
   bankAccountNumber: Sequelize.STRING,
   mobilizer: Sequelize.STRING,
   ward: Sequelize.STRING,
+  registrationDate: Sequelize.STRING,
   isQR: {
     type: Sequelize.BOOLEAN,
     defaultValue: false,

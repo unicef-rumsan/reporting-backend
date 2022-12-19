@@ -3,4 +3,6 @@
 /play/
 */uploads
 /package-lock.json
+/.yarn
 yarn-error.log
+.DS_Store

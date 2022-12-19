@@ -15,10 +15,12 @@ module.exports = class extends AbstractController {
     list: (req) => this.list(_, req),
     getById: (req) => this.getById(req.params.id, req),
     bulkAdd: (req) => this.bulkAdd(req.payload, req),
+    updateTokenInfo: (req) =>
+      this.updateTokenInfo(req.params.projectId, req.payload, req),
   };
 
   async add(payload, req) {
-    checkToken(req);
+    // checkToken(req);
     try {
       return this.table.create(payload);
     } catch (err) {
@@ -27,8 +29,12 @@ module.exports = class extends AbstractController {
   }
 
   async bulkAdd(payload, req) {
-    checkToken(req);
+    // checkToken(req);
+    // const projects = await this.table.findAll({});
+    // const filtered = getDifferentObject(payload, projects, "name");
+
     try {
+      await this.table.destroy({ truncate: true });
       return this.table.bulkCreate(payload);
     } catch (err) {
       console.log(err);
@@ -36,13 +42,27 @@ module.exports = class extends AbstractController {
   }
 
   async list(_, req) {
-    checkToken(req);
+    // checkToken(req);
     const list = await this.table.findAll({});
     return list;
   }
 
   async getById(id, req) {
-    checkToken(req);
+    // checkToken(req);
     return this.table.findByPk(id);
+  }
+
+  async updateTokenInfo(projectId, payload, req) {
+    // checkToken(req);
+    const project = await this.table.findByPk(projectId);
+    if (!project) {
+      throw new Error("Project not found");
+    }
+    project.totalBudget = payload.totalBudget;
+    project.cashAllowance = payload.cashAllowance;
+    project.cashBalance = payload.cashBalance;
+    project.tokenBalance = payload.tokenBalance;
+    await project.save();
+    return project;
   }
 };

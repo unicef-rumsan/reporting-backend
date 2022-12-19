@@ -32,5 +32,20 @@ module.exports = class extends AbstractRouter {
       path: "/{id}",
       description: "Get Beneficiary by id",
     },
+    updateExplorerTokenInfo: {
+      method: "PATCH",
+      path: "/updateExplorerTokenInfo/{beneficiaryPhone}",
+      description: "Update Beneficiary Explorer Token Info",
+    },
+    getBeneficiaryByWard: {
+      method: "GET",
+      path: "/getBeneficiaryByWard",
+      description: "Get Beneficiary By Ward",
+    },
+    updateTokenInfo: {
+      method: "PATCH",
+      path: "/updateTokenInfo/{beneficiaryPhone}",
+      description: "Update Beneficiary  Token Info",
+    },
   };
 };

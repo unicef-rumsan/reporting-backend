@@ -1,13 +1,18 @@
+const TransactionClaimERCCacheModel = require("./cache_claimAcquiredERC20/cache.model");
 const BeneficiaryModel = require("./beneficiary/beneficiary.model");
 const ProjectModel = require("./project/project.model");
-const TransactionModel = require("./tx/tx.model");
 const VendorModel = require("./vendor/vendor.model");
+const IssuedTokensModel = require("./issued-tokens/issued-tokens.model");
+const MiscModel = require("./misc/misc.model");
 
 let modelFactory = {
+  TransactionClaimERCCacheModel: new TransactionClaimERCCacheModel().init(),
+
   BeneficiaryModel: new BeneficiaryModel().init(),
-  TransactionModel: new TransactionModel().init(),
   VendorModel: new VendorModel().init(),
   ProjectModel: new ProjectModel().init(),
+  IssuedTokensModel: new IssuedTokensModel().init(),
+  MiscModel: new MiscModel().init(),
 };
 
 /**********************************************************

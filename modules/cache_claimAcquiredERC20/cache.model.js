@@ -20,39 +20,44 @@ const schema = {
     type: Sequelize.INTEGER,
     allowNull: false,
   },
-  phone: {
+  beneficiary: {
     type: Sequelize.STRING,
-    allowNull: false,
   },
-
+  // phone: {
+  //   type: Sequelize.STRING,
+  //   allowNull: false,
+  // },
   ward: {
     type: Sequelize.INTEGER,
-    allowNull: false,
+    defaultValue: 0,
   },
   timestamp: {
-    type: Sequelize.STRING,
-    allowNull: false,
-    set(v) {
-      this.setDataValue("timestamp", v.toISOString());
-      this.setDataValue("year", new Date(v).getFullYear());
-    },
+    type: Sequelize.INTEGER,
+    // allowNull: false,
+    // set(v) {
+    //   // this.setDataValue("timestamp", v.toISOString());
+    //   this.setDataValue("year", new Date(v).getFullYear());
+    // },
   },
   year: {
     type: Sequelize.STRING,
   },
   method: {
-    type: Sequelize.ENUM("sms", "qr"),
-    allowNull: false,
+    type: Sequelize.ENUM("sms", "qr", "unavailable"),
+    defaultValue: "unavailable",
   },
   mode: {
-    type: Sequelize.ENUM("online", "offline"),
-    allowNull: false,
+    type: Sequelize.ENUM("online", "offline", "unavailable"),
+    defaultValue: "unavailable",
   },
+  isClaimed: Sequelize.BOOLEAN,
+  // isOnline: Sequelize.BOOLEAN,
+  tokenIssued: Sequelize.STRING,
 };
 
 module.exports = class extends AbstractModel {
   schema = schema;
   constructor() {
-    super({ tableName: "tblTxs" });
+    super({ tableName: "tblCache_ClaimAcquiredERC20" });
   }
 };

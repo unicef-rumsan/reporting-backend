@@ -10,9 +10,22 @@ const schema = {
   name: Sequelize.STRING,
   gender: Sequelize.STRING,
   phone: Sequelize.STRING,
-  wallet_address: Sequelize.STRING,
-  govt_id: Sequelize.STRING,
+  walletAddress: Sequelize.STRING,
+  govtId: Sequelize.STRING,
   agencies: Sequelize.ARRAY(Sequelize.JSON),
+  projects: Sequelize.ARRAY(Sequelize.STRING),
+  cashAllowance: {
+    type: Sequelize.INTEGER,
+    defaultValue: 0,
+  },
+  tokenBalance: {
+    type: Sequelize.INTEGER,
+    defaultValue: 0,
+  },
+  cashBalance: {
+    type: Sequelize.INTEGER,
+    defaultValue: 0,
+  },
 };
 
 module.exports = class extends AbstractModel {

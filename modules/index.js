@@ -11,6 +11,7 @@ const Misc = require("./misc");
 //const Tag = require("./tag");
 const { mailOtp } = require("./eventHandlers");
 const { EVENTS } = require("../constants/appConstants");
+const _Communications = require("./communications");
 
 let Routes = {
   AppSettings: AppSettings.Router(),
@@ -22,6 +23,7 @@ let Routes = {
   Reporting: new _Reporting(),
   IssuedTokens: new _IssuedTokens(),
   Misc: new Misc(),
+  Communications: new _Communications(),
 };
 
 ContractListener.on(EVENTS.TRANSACTION_ADDED, (data) => {

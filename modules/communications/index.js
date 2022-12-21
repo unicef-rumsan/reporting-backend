@@ -1,0 +1,36 @@
+// const Validator = require("./communications.validators");
+const Controller = require("./communications.controller");
+const { AbstractRouter } = require("@rumsan/core/abstract");
+
+module.exports = class extends AbstractRouter {
+  constructor(options = {}) {
+    options.name = options.name || "communications";
+    options.listeners = {};
+    options.controller = new Controller(options);
+    // options.validator = new Validator(options);
+    super(options);
+  }
+  routes = {
+    add: {
+      method: "POST",
+      path: "",
+      description: "Add new communications",
+    },
+    bulkAdd: {
+      method: "POST",
+      path: "/bulk",
+      description: "Add new communications in bulk",
+    },
+    list: {
+      method: "GET",
+      path: "",
+      description: "List all communications",
+      //permissions: ["note_read"],
+    },
+    getById: {
+      method: "GET",
+      path: "/{id}",
+      description: "Get communications by id",
+    },
+  };
+};

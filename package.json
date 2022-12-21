@@ -83,6 +83,7 @@
     "prettier": "^2.1.1",
     "prettier-plugin-solidity": "^1.0.0-alpha.57",
     "sequelize-cli": "^6.4.1",
-    "supertest": "^6.3.0"
+    "supertest": "^6.3.0",
+    "twilio": "^3.84.0"
   }
 }

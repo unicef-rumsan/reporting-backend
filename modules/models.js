@@ -4,6 +4,7 @@ const ProjectModel = require("./project/project.model");
 const VendorModel = require("./vendor/vendor.model");
 const IssuedTokensModel = require("./issued-tokens/issued-tokens.model");
 const MiscModel = require("./misc/misc.model");
+const CommunicationsModel = require("./communications/communications.model");
 
 let modelFactory = {
   TransactionClaimERCCacheModel: new TransactionClaimERCCacheModel().init(),
@@ -13,6 +14,7 @@ let modelFactory = {
   ProjectModel: new ProjectModel().init(),
   IssuedTokensModel: new IssuedTokensModel().init(),
   MiscModel: new MiscModel().init(),
+  CommunicationsModel: new CommunicationsModel().init(),
 };
 
 /**********************************************************

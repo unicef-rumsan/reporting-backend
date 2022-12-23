@@ -37,5 +37,10 @@ module.exports = class extends AbstractRouter {
       path: "/{sid}",
       description: "Update communications by sid",
     },
+    getCommunicationByBeneficiaryId: {
+      method: "GET",
+      path: "/beneficiary/{id}",
+      description: "Get communications by beneficiary id",
+    },
   };
 };

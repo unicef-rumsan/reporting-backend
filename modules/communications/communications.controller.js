@@ -1,13 +1,14 @@
 const { AbstractController } = require("@rumsan/core/abstract");
 const checkToken = require("../../helpers/utils/checkToken");
 const { finderByProjectId } = require("../../helpers/utils/projectFinder");
-const { CommunicationsModel } = require("../models");
+const { CommunicationsModel, BeneficiaryModel } = require("../models");
 
 module.exports = class extends AbstractController {
   constructor(options) {
     super((options = {}));
     options.listeners = {};
     this.table = CommunicationsModel;
+    this.tblBeneficiaries = BeneficiaryModel;
   }
 
   registrations = {
@@ -16,10 +17,16 @@ module.exports = class extends AbstractController {
     getById: (req) => this.getById(req.params.id, req),
     bulkAdd: (req) => this.bulkAdd(req.payload, req),
     update: (req) => this.update(req.params.sid, req.payload, req),
+    getCommunicationByBeneficiaryId: (req) =>
+      this.getCommunicationByBeneficiaryId(req.params.id, req),
   };
 
   async add(payload, req) {
     // checkToken(req);
+    const beneficiary = await this.tblBeneficiaries.findOne({
+      where: { phone: payload.to.replace("+977", "") },
+    });
+    payload.beneficiaryId = beneficiary.id;
     try {
       return this.table.create(payload);
     } catch (err) {
@@ -68,5 +75,10 @@ module.exports = class extends AbstractController {
     console.log("sid", sid);
     // checkToken(req);
     return this.table.update(payload, { where: { sid } });
+  }
+
+  async getCommunicationByBeneficiaryId(id, req) {
+    // checkToken(req);
+    return this.table.findAll({ where: { beneficiaryId: id } });
   }
 };

@@ -76,6 +76,13 @@ const schema = {
     type: Sequelize.BOOLEAN,
     defaultValue: false,
   },
+  beneficiaryId: {
+    type: Sequelize.STRING,
+    set(v) {
+      this.setDataValue("beneficiaryId", v);
+      this.setDataValue("isBeneficiary", true);
+    },
+  },
 };
 
 module.exports = class extends AbstractModel {

@@ -15,6 +15,7 @@ module.exports = class extends AbstractController {
     list: (req) => this.list(req.query, req.headers.projectId),
     getById: (req) => this.getById(req.params.id, req),
     bulkAdd: (req) => this.bulkAdd(req.payload, req),
+    update: (req) => this.update(req.params.sid, req.payload, req),
   };
 
   async add(payload, req) {
@@ -59,7 +60,13 @@ module.exports = class extends AbstractController {
   }
 
   async getById(id, req) {
-    checkToken(req);
+    // checkToken(req);
     return this.table.findByPk(id);
+  }
+
+  async update(sid, payload, req) {
+    console.log("sid", sid);
+    // checkToken(req);
+    return this.table.update(payload, { where: { sid } });
   }
 };

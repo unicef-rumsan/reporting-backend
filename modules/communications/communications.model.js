@@ -22,9 +22,15 @@ const schema = {
   },
   from: {
     type: Sequelize.STRING,
+    set(v) {
+      this.setDataValue("from", v.replace("+977", ""));
+    },
   },
   to: {
     type: Sequelize.STRING,
+    set(v) {
+      this.setDataValue("to", v.replace("+977", ""));
+    },
   },
   uri: {
     type: Sequelize.STRING,
@@ -65,6 +71,10 @@ const schema = {
   communication_type: {
     type: Sequelize.ENUM,
     values: ["sms", "call"],
+  },
+  isBeneficiary: {
+    type: Sequelize.BOOLEAN,
+    defaultValue: false,
   },
 };
 

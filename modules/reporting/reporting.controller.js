@@ -366,6 +366,21 @@ module.exports = class extends AbstractController {
             this.db.Sequelize.fn("sum", this.db.Sequelize.col("below5_other")),
             "below5_otherTotal",
           ],
+          "noLand",
+          [
+            this.db.Sequelize.fn("count", this.db.Sequelize.col("noLand")),
+            "noLandTotal",
+          ],
+          "dailyWage",
+          [
+            this.db.Sequelize.fn("count", this.db.Sequelize.col("dailyWage")),
+            "dailyWageTotal",
+          ],
+          "disability",
+          [
+            this.db.Sequelize.fn("count", this.db.Sequelize.col("disability")),
+            "disabilityTotal",
+          ],
         ],
         group: [
           "familySize",
@@ -373,6 +388,9 @@ module.exports = class extends AbstractController {
           "below5Male",
           "below5Female",
           "below5_other",
+          "noLand",
+          "dailyWage",
+          "disability",
         ],
       },
       req.headers.projectId
@@ -399,6 +417,15 @@ module.exports = class extends AbstractController {
       0
     );
 
+    const totalNoLand = list.reduce((acc, item) => +acc + +item.noLandTotal, 0);
+    const totalWithLand = list.reduce((acc, item) => +acc + !item.noLand, 0);
+
+    const totalDailyWage = list.reduce((acc, item) => +acc + item.dailyWage, 0);
+    const totalDisability = list.reduce(
+      (acc, item) => +acc + item.disability,
+      0
+    );
+
     const totalClaimed = await this._getClaimedBeneficiaryCount(req);
     const data = {
       impacted: {
@@ -408,6 +435,10 @@ module.exports = class extends AbstractController {
         totalBelow5Female,
         totalBelow5Other,
         totalClaimed: totalClaimed ? totalClaimed.count : 0,
+        totalNoLand,
+        totalWithLand,
+        totalDailyWage,
+        totalDisability,
       },
     };
 

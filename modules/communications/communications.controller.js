@@ -26,7 +26,12 @@ module.exports = class extends AbstractController {
     const beneficiary = await this.tblBeneficiaries.findOne({
       where: { phone: payload.to.replace("+977", "") },
     });
-    payload.beneficiaryId = beneficiary.id;
+
+    if (beneficiary) {
+      payload.beneficiaryId = beneficiary.id;
+    } else {
+      payload.beneficiaryId = null;
+    }
     try {
       return this.table.create(payload);
     } catch (err) {

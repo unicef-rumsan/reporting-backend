@@ -79,8 +79,10 @@ const schema = {
   beneficiaryId: {
     type: Sequelize.STRING,
     set(v) {
-      this.setDataValue("beneficiaryId", v);
-      this.setDataValue("isBeneficiary", true);
+      if (v) {
+        this.setDataValue("isBeneficiary", true);
+        this.setDataValue("beneficiaryId", v);
+      }
     },
   },
 };

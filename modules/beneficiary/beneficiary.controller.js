@@ -1,9 +1,8 @@
 const { AbstractController } = require("@rumsan/core/abstract");
 const WSService = require("@rumsan/core/services/webSocket");
-const { where, Op, col, fn } = require("sequelize");
 const checkToken = require("../../helpers/utils/checkToken");
-const getDifferentObject = require("../../helpers/utils/getDifferentObject");
 const { finderByProjectId } = require("../../helpers/utils/projectFinder");
+const { searchObjectKeys } = require("../../helpers/utils/searchFunctions");
 const { BeneficiaryModel } = require("../models");
 
 module.exports = class extends AbstractController {
@@ -56,36 +55,11 @@ module.exports = class extends AbstractController {
   async list(query, projectId) {
     const { limit, start, ...restQuery } = query;
 
-    let searchQuery = {};
-    if (restQuery.name) {
-      searchQuery.name = where(
-        fn("LOWER", col("name")),
-        "LIKE",
-        "%" + restQuery.name + "%"
-      );
-    }
-
-    if (restQuery.phone) {
-      searchQuery.phone = where(
-        fn("LOWER", col("phone")),
-        "LIKE",
-        "%" + restQuery.phone + "%"
-      );
-    }
-
-    if (restQuery.ward) {
-      searchQuery.ward = where(
-        fn("LOWER", col("ward")),
-        "LIKE",
-        "%" + restQuery.ward + "%"
-      );
-    }
-
     // checkToken(req);
     let { rows: list, count } = await finderByProjectId(
       this.table,
       {
-        where: searchQuery,
+        where: searchObjectKeys(restQuery),
         limit: limit || 100,
         offset: start || 0,
       },
@@ -99,6 +73,7 @@ module.exports = class extends AbstractController {
       limit,
       start,
       totalPage: Math.ceil(count / limit),
+      searchingBy: restQuery,
     };
   }
 

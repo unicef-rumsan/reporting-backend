@@ -73,6 +73,14 @@ module.exports = class extends AbstractController {
       );
     }
 
+    if (restQuery.ward) {
+      searchQuery.ward = where(
+        fn("LOWER", col("ward")),
+        "LIKE",
+        "%" + restQuery.ward + "%"
+      );
+    }
+
     // checkToken(req);
     let { rows: list, count } = await finderByProjectId(
       this.table,

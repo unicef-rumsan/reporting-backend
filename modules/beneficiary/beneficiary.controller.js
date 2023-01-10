@@ -92,6 +92,7 @@ module.exports = class extends AbstractController {
       beneficiary.cashBalance = payload.cashBalance;
       beneficiary.tokenBalance = payload.tokenBalance;
       beneficiary.totalTokenIssued = payload.totalTokenIssued;
+      beneficiary.isClaimed = payload.cashBalance > 0 ? true : false;
       beneficiary.save();
     }
     return beneficiary;

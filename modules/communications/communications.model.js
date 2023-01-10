@@ -18,7 +18,7 @@ const schema = {
   status: {
     type: Sequelize.ENUM,
     allowNull: false,
-    values: ["success", "no_answer", "fail"],
+    values: ["success", "unanswered", "busy", "fail"],
   },
   message: {
     type: Sequelize.STRING,

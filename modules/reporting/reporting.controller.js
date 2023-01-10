@@ -417,12 +417,25 @@ module.exports = class extends AbstractController {
       0
     );
 
-    const totalNoLand = list.reduce((acc, item) => +acc + +item.noLandTotal, 0);
-    const totalWithLand = list.reduce((acc, item) => +acc + !item.noLand, 0);
+    const landData = await this._wardGraphStack(null, "noLand");
 
-    const totalDailyWage = list.reduce((acc, item) => +acc + item.dailyWage, 0);
-    const totalDisability = list.reduce(
-      (acc, item) => +acc + item.disability,
+    const totalNoLand = landData.reduce((acc, item) => +acc + +item.noLand, 0);
+    const totalWithLand = landData.reduce(
+      (acc, item) => +acc + +item.nonoLand,
+      0
+    );
+
+    const dailyWageData = await this._wardGraphStack(null, "dailyWage");
+
+    const totalDailyWage = dailyWageData.reduce(
+      (acc, item) => +acc + +item.dailyWage,
+      0
+    );
+
+    const disabilityData = await this._wardGraphStack(null, "disability");
+
+    const totalDisability = disabilityData.reduce(
+      (acc, item) => +acc + +item.disability,
       0
     );
 

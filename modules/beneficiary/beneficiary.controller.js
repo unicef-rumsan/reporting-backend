@@ -103,7 +103,7 @@ module.exports = class extends AbstractController {
     const beneficiary = await this.table.findOne({ where: { phone } });
 
     if (beneficiary) {
-      beneficiary.isClaimed = isClaimed;
+      // beneficiary.isClaimed = isClaimed;
       beneficiary.isOffline = isOffline;
       beneficiary.tokenIssued = tokenIssued;
       beneficiary.save();

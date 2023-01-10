@@ -98,7 +98,7 @@ module.exports = class extends AbstractController {
 
   async list() {
     const list = await this.table.findAll({
-      limit: 10,
+      limit: 100,
       raw: true,
       order: [["timestamp", "DESC"]],
       // order: [["timestamp", "DESC"]],

@@ -1,15 +1,20 @@
 const { AbstractController } = require("@rumsan/core/abstract");
 const WSService = require("@rumsan/core/services/webSocket");
+const { Op } = require("sequelize");
 const checkToken = require("../../helpers/utils/checkToken");
 const { finderByProjectId } = require("../../helpers/utils/projectFinder");
 const { searchObjectKeys } = require("../../helpers/utils/searchFunctions");
-const { BeneficiaryModel } = require("../models");
+const {
+  BeneficiaryModel,
+  TransactionClaimERCCacheModel,
+} = require("../models");
 
 module.exports = class extends AbstractController {
   constructor(options) {
     super(options);
     options.listeners = {};
     this.table = BeneficiaryModel;
+    this.tblClaimTransactions = TransactionClaimERCCacheModel;
   }
 
   registrations = {
@@ -26,7 +31,7 @@ module.exports = class extends AbstractController {
     getBeneficiaryCountByGroup: (req) => this.getBeneficiaryCountByGroup(),
     getBeneficiaryCountByGender: (req) => this.getBeneficiaryCountByGender(),
     getBeneficiaryByWard: (req) =>
-      this.getBeneficiaryByWard(req.query.ward, req),
+      this.getBeneficiaryByWard(req.query.ward, req.headers.projectId),
     updateTokenInfo: (req) =>
       this.updateTokenInfo(req.params.beneficiaryPhone, req.payload, req),
   };
@@ -130,14 +135,32 @@ module.exports = class extends AbstractController {
     return list;
   }
 
-  async getBeneficiaryByWard(ward, req) {
-    const list = await finderByProjectId(
+  async getBeneficiaryByWard(ward, projectId) {
+    let { rows, count } = await finderByProjectId(
       this.table,
       {
         where: { ward },
+        raw: true,
       },
-      req.headers.projectId
+      projectId
     );
-    return list;
+
+    // beneficiaries = JSON.parse(JSON.stringify(beneficiaries));
+
+    const beneficiaryPhones = rows.map((b) => b.phone);
+
+    const transactions = await this.tblClaimTransactions.findAll({
+      where: {
+        beneficiary: {
+          [Op.in]: beneficiaryPhones,
+        },
+      },
+      // attributes: ["name", "phone"],
+      raw: true,
+    });
+    return {
+      data: transactions,
+      count,
+    };
   }
 };

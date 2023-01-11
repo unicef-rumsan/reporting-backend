@@ -57,6 +57,7 @@ module.exports = class extends AbstractController {
         where: { ...restQuery },
         limit: limit || 100,
         offset: start || 0,
+        order: [["timestamp", "DESC"]],
       },
       projectId
     );

@@ -2,89 +2,33 @@ const { AbstractModel } = require("@rumsan/core/abstract");
 const Sequelize = require("sequelize");
 
 const schema = {
-  api_version: {
-    type: Sequelize.STRING,
-  },
-  sid: {
-    type: Sequelize.STRING,
-  },
-  account_sid: {
-    type: Sequelize.STRING,
-  },
-  date_created: {
-    type: Sequelize.STRING,
-  },
-  date_updated: {
-    type: Sequelize.STRING,
-  },
-  annotation: {
-    type: Sequelize.STRING,
-  },
-  from: {
-    type: Sequelize.STRING,
-    set(v) {
-      this.setDataValue("from", v.replace("+977", ""));
-    },
-  },
   to: {
     type: Sequelize.STRING,
-    set(v) {
-      this.setDataValue("to", v.replace("+977", ""));
-    },
+    allowNull: false,
   },
-  uri: {
-    type: Sequelize.STRING,
+  timestamp: {
+    type: Sequelize.BIGINT,
+    allowNull: false,
   },
-  duration: {
-    type: Sequelize.STRING,
-  },
-  price: {
-    type: Sequelize.STRING,
-  },
-  price_unit: {
-    type: Sequelize.STRING,
-  },
-  status: {
-    type: Sequelize.STRING,
-  },
-  direction: {
-    type: Sequelize.STRING,
-  },
-  error_code: {
-    type: Sequelize.STRING,
-  },
-  error_message: {
-    type: Sequelize.STRING,
-  },
-  body: {
-    type: Sequelize.STRING,
-  },
-  num_segments: {
-    type: Sequelize.STRING,
-  },
-  num_media: {
-    type: Sequelize.STRING,
-  },
-  date_sent: {
-    type: Sequelize.STRING,
-  },
-  communication_type: {
+  type: {
     type: Sequelize.ENUM,
+    allowNull: false,
     values: ["sms", "call"],
   },
-  isBeneficiary: {
-    type: Sequelize.BOOLEAN,
-    defaultValue: false,
+  status: {
+    type: Sequelize.ENUM,
+    allowNull: false,
+    values: ["success", "unanswered", "busy", "fail"],
   },
-  beneficiaryId: {
+  message: {
     type: Sequelize.STRING,
-    set(v) {
-      if (v) {
-        this.setDataValue("isBeneficiary", true);
-        this.setDataValue("beneficiaryId", v);
-      }
-    },
+    allowNull: false,
   },
+  beneficiaryId: Sequelize.STRING,
+  from: Sequelize.STRING,
+  hangupCause: Sequelize.STRING,
+  duration: Sequelize.INTEGER,
+  billDuration: Sequelize.INTEGER,
 };
 
 module.exports = class extends AbstractModel {

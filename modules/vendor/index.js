@@ -27,6 +27,11 @@ module.exports = class extends AbstractRouter {
       description: "List all vendor",
       //permissions: ["note_read"],
     },
+    getByWard: {
+      method: "GET",
+      path: "/ward/{ward}",
+      description: "Get vendor by ward",
+    },
     getById: {
       method: "GET",
       path: "/{id}",

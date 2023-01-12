@@ -41,6 +41,17 @@ const validators = {
       ward: Joi.string().required(),
     }),
   },
+  list: {
+    query: Joi.object({
+      limit: Joi.number().integer().min(1).default(50),
+      ward: Joi.string().allow("").optional(),
+      hasBank: Joi.string().allow("").optional(),
+      start: Joi.number().integer().min(0).default(0),
+      isClaimed: Joi.string().allow("").optional(),
+      phone: Joi.string().allow("").optional(),
+      name: Joi.string().allow("").optional(),
+    }),
+  },
 };
 
 module.exports = class extends AbstractValidator {

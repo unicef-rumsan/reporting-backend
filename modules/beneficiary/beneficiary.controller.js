@@ -58,7 +58,7 @@ module.exports = class extends AbstractController {
   }
 
   async list(query, projectId) {
-    const { limit, start, ...restQuery } = query;
+    const { limit, start, cashReceived, ...restQuery } = query;
 
     // checkToken(req);
     let { rows: list, count } = await finderByProjectId(

@@ -1,6 +1,8 @@
 const { AbstractController } = require("@rumsan/core/abstract");
+const { Op } = require("sequelize");
 const checkToken = require("../../helpers/utils/checkToken");
 const { finderByProjectId } = require("../../helpers/utils/projectFinder");
+const { searchObjectKeys } = require("../../helpers/utils/searchFunctions");
 const { CommunicationsModel, BeneficiaryModel } = require("../models");
 
 module.exports = class extends AbstractController {
@@ -54,7 +56,13 @@ module.exports = class extends AbstractController {
     let { rows: list, count } = await finderByProjectId(
       this.table,
       {
-        where: { ...restQuery },
+        where: {
+          beneficiaryId: {
+            [Op.ne]: null,
+          },
+
+          ...searchObjectKeys(restQuery),
+        },
         limit: limit || 100,
         offset: start || 0,
         order: [["timestamp", "DESC"]],

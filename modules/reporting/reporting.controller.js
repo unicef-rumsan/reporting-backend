@@ -875,9 +875,9 @@ module.exports = class extends AbstractController {
       return {
         ward: key,
         [`no${filterKey}`]:
-          itemGroup[key].find((d) => d[filterKey] === true)?.count || 0,
-        [filterKey]:
           itemGroup[key].find((d) => d[filterKey] === false)?.count || 0,
+        [filterKey]:
+          itemGroup[key].find((d) => d[filterKey] === true)?.count || 0,
       };
     });
   }

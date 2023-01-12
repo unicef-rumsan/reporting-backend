@@ -7,6 +7,8 @@ const {
 } = require("../models");
 const { Op } = require("sequelize");
 const getDifferentObject = require("../../helpers/utils/getDifferentObject");
+const { finderByProjectId } = require("../../helpers/utils/projectFinder");
+const { searchObjectKeys } = require("../../helpers/utils/searchFunctions");
 
 module.exports = class extends AbstractController {
   constructor(options) {
@@ -18,7 +20,7 @@ module.exports = class extends AbstractController {
 
   registrations = {
     add: (req) => this.add(req.payload),
-    list: (req) => this.list(),
+    list: (req) => this.list(req.query, req.headers.projectId),
     bulkAdd: (req) => this.bulkAdd(req.payload),
     listByTxHashes: (req) => this.listByTxHashes(req.payload.txHashes),
     update: (req) => this.update(req.params.txHash, req.payload),
@@ -82,28 +84,46 @@ module.exports = class extends AbstractController {
           [Op.in]: phonesList,
         },
       },
-      attributes: ["name", "phone"],
+      attributes: ["name", "phone", "ward"],
       raw: true,
     });
     const beneficiaryMapped = list.map((item) => {
       let benef = beneficiaryList.find((b) => b.phone === item.beneficiary);
       return {
-        ...benef,
         ...item,
+        ...benef,
       };
     });
 
     return beneficiaryMapped;
   }
 
-  async list() {
-    const list = await this.table.findAll({
-      limit: 100,
-      raw: true,
-      order: [["timestamp", "DESC"]],
-      // order: [["timestamp", "DESC"]],
-    });
+  async list(query, projectId) {
+    const { limit, start, ...restQuery } = query;
+
+    let { rows: list, count } = await finderByProjectId(
+      this.table,
+      {
+        where: searchObjectKeys(restQuery),
+
+        limit: limit || 100,
+        offset: start || 0,
+        raw: true,
+        order: [["timestamp", "DESC"]],
+        // order: [["timestamp", "DESC"]],
+      },
+      projectId
+    );
     const beneficiaryMapped = await this._replaceWithBeneficiaryName(list);
+
+    return {
+      data: beneficiaryMapped,
+      count,
+      limit,
+      start,
+      totalPage: Math.ceil(count / limit),
+      searchingBy: restQuery,
+    };
     return beneficiaryMapped;
     // return list;
   }

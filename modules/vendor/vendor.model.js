@@ -8,6 +8,7 @@ const schema = {
     allowNull: false,
   },
   name: Sequelize.STRING,
+  ward: Sequelize.STRING,
   gender: Sequelize.STRING,
   phone: Sequelize.STRING,
   walletAddress: Sequelize.STRING,
@@ -22,6 +23,11 @@ const schema = {
     type: Sequelize.INTEGER,
     defaultValue: 0,
   },
+  cashReceived: {
+    type: Sequelize.INTEGER,
+    defaultValue: 0,
+  },
+  cashReceivedDate: Sequelize.INTEGER,
   cashBalance: {
     type: Sequelize.INTEGER,
     defaultValue: 0,

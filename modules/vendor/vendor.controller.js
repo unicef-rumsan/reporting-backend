@@ -16,6 +16,7 @@ module.exports = class extends AbstractController {
     add: (req) => this.add(req.payload, req),
     list: (req) => this.list(req.query, req.headers.projectId),
     getById: (req) => this.getById(req.params.id, req),
+    getByWard: (req) => this.getByWard(req.params.ward, req),
     bulkAdd: (req) => this.bulkAdd(req.payload, req),
     updateTokenInfo: (req) =>
       this.updateTokenInfo(req.params.vendorId, req.payload, req),
@@ -65,19 +66,23 @@ module.exports = class extends AbstractController {
     };
   }
 
+  async getByWard(ward) {
+    return this.table.findOne({ where: { ward } });
+  }
+
   async getById(id, req) {
     checkToken(req);
 
     return this.table.findByPk(id);
   }
 
-  async updateTokenInfo(vendorId, payload, req) {
-    // checkToken(req);
-
+  async updateTokenInfo(vendorId, payload) {
     const vendor = await this.table.findByPk(vendorId);
     if (!vendor) {
       throw new Error("Vendor not found");
     }
+    vendor.cashReceived = payload.cashReceived;
+    vendor.cashReceivedDate = payload.cashReceivedDate;
     vendor.cashAllowance = payload.cashAllowance;
     vendor.tokenBalance = payload.tokenBalance;
     vendor.cashBalance = payload.cashBalance;

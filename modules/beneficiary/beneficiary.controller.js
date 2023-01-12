@@ -135,6 +135,28 @@ module.exports = class extends AbstractController {
     return list;
   }
 
+  async _replaceWithBeneficiaryName(list) {
+    const phonesList = list.map((item) => item.beneficiary);
+    const beneficiaryList = await this.table.findAll({
+      where: {
+        phone: {
+          [Op.in]: phonesList,
+        },
+      },
+      attributes: ["name", "phone", "ward", "isQR", "isOffline"],
+      raw: true,
+    });
+    const beneficiaryMapped = list.map((item) => {
+      let benef = beneficiaryList.find((b) => b.phone === item.beneficiary);
+      return {
+        ...item,
+        ...benef,
+      };
+    });
+
+    return beneficiaryMapped;
+  }
+
   async getBeneficiaryByWard(ward, projectId) {
     let { rows, count } = await finderByProjectId(
       this.table,
@@ -158,8 +180,12 @@ module.exports = class extends AbstractController {
       // attributes: ["name", "phone"],
       raw: true,
     });
+
+    const beneficiaryMapped = await this._replaceWithBeneficiaryName(
+      transactions
+    );
     return {
-      data: transactions,
+      data: beneficiaryMapped,
       count,
     };
   }

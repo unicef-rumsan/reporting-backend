@@ -51,8 +51,13 @@ module.exports = class extends AbstractController {
   }
 
   async list(query, projectId) {
-    const { limit, start, ...restQuery } = query;
-    // checkToken(req);
+    const { limit, start, status, ...restQuery } = query;
+    let customFilters = {};
+
+    if (status) {
+      customFilters.status = status;
+    }
+
     let { rows: list, count } = await finderByProjectId(
       this.table,
       {
@@ -60,7 +65,7 @@ module.exports = class extends AbstractController {
           beneficiaryId: {
             [Op.ne]: null,
           },
-
+          ...customFilters,
           ...searchObjectKeys(restQuery),
         },
         limit: limit || 100,

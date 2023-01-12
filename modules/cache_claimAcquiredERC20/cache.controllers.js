@@ -84,7 +84,7 @@ module.exports = class extends AbstractController {
           [Op.in]: phonesList,
         },
       },
-      attributes: ["name", "phone", "ward"],
+      attributes: ["name", "phone", "ward", "isQR", "isOffline"],
       raw: true,
     });
     const beneficiaryMapped = list.map((item) => {

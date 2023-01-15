@@ -184,9 +184,14 @@ module.exports = class extends AbstractController {
     const beneficiaryMapped = await this._replaceWithBeneficiaryName(
       transactions
     );
+    const remainingBeneficiaries = rows.filter(
+      (b) => !transactions.find((t) => t.beneficiary === b.phone)
+    );
+
     return {
       data: beneficiaryMapped,
       count,
+      numOfBenefRemainingToClaim: remainingBeneficiaries.length,
     };
   }
 };

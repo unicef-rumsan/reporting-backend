@@ -1,4 +1,4 @@
-// const Validator = require("./vendor.validators");
+const Validator = require("./vendor.validator");
 const Controller = require("./vendor.controller");
 const { AbstractRouter } = require("@rumsan/core/abstract");
 
@@ -7,7 +7,7 @@ module.exports = class extends AbstractRouter {
     options.name = options.name || "vendors";
     options.listeners = {};
     options.controller = new Controller(options);
-    // options.validator = new Validator(options);
+    options.validator = new Validator(options);
     super(options);
   }
   routes = {

@@ -158,9 +158,15 @@ module.exports = class extends AbstractController {
       // attributes: ["name", "phone"],
       raw: true,
     });
+
+    const remainingBeneficiaries = rows.filter(
+      (b) => !transactions.find((t) => t.beneficiary === b.phone)
+    );
+
     return {
       data: transactions,
       count,
+      numOfBenefRemainingToClaim: remainingBeneficiaries.length,
     };
   }
 };

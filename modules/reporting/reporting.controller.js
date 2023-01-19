@@ -432,6 +432,11 @@ module.exports = class extends AbstractController {
       0
     );
 
+    const totalNonDailyWage = dailyWageData.reduce(
+      (acc, item) => +acc + +item.nodailyWage,
+      0
+    );
+
     const disabilityData = await this._wardGraphStack(null, "disability");
 
     const totalDisability = disabilityData.reduce(
@@ -440,6 +445,7 @@ module.exports = class extends AbstractController {
     );
 
     const totalClaimed = await this._getClaimedBeneficiaryCount(req);
+    const totalNoLandCalc = totalNoLand - totalNonDailyWage;
     const data = {
       impacted: {
         totalFamilyCount,
@@ -448,10 +454,10 @@ module.exports = class extends AbstractController {
         totalBelow5Female,
         totalBelow5Other,
         totalClaimed: totalClaimed ? totalClaimed.count : 0,
-        totalNoLand,
+        totalNoLand: totalNoLandCalc,
         totalWithLand,
         totalDailyWage,
-        totalDisability,
+        totalDisability: totalNoLandCalc - totalDisability,
       },
     };
 

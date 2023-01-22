@@ -80,6 +80,12 @@ module.exports = class extends AbstractRouter {
       description: "Get Impacted Beneficiaries",
     },
 
+    getWardClaimDistributionByKey: {
+      method: "GET",
+      path: "/beneficiary/ward-claim-distribution",
+      description: "Get Impacted Beneficiaries",
+    },
+
     /**
      * End of the day
      */
@@ -96,6 +102,7 @@ module.exports = class extends AbstractRouter {
       path: "/demographic/ward",
       description: "Get Land Owner Demographic Data",
     },
+
     // #endregion
   };
 };

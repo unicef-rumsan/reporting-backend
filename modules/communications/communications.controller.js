@@ -52,20 +52,23 @@ module.exports = class extends AbstractController {
   }
 
   async list(query, projectId) {
-    const { limit, start, status, ...restQuery } = query;
+    const { limit, start, status, showall, ...restQuery } = query;
     let customFilters = {};
 
     if (status) {
       customFilters.status = status;
     }
 
+    if (!showall) {
+      customFilters.beneficiaryId = {
+        [Op.ne]: null,
+      };
+    }
+
     let { rows: list, count } = await finderByProjectId(
       this.table,
       {
         where: {
-          beneficiaryId: {
-            [Op.ne]: null,
-          },
           ...customFilters,
           ...searchObjectKeys(restQuery),
         },
@@ -103,26 +106,13 @@ module.exports = class extends AbstractController {
   }
 
   async addCallbackUrl(payload, req) {
-    // {
-    //   CallSid: '85cab075-01d1-492a-a4ab-482c7401533a',
-    //   AccountSid: '4d741335-4843-44e2-b4f5-8d22cdaa7687',
-    //   From: '+9779801230044',
-    //   To: '+9779801109670',
-    //   CallStatus: 'completed',
-    //   ApiVersion: '2010-04-01',
-    //   Direction: 'outbound-api',
-    //   CallDuration: '15',
-    //   SipResponseCode: '200',
-    //   CallbackSource: 'call-progress-events',
-    //   Timestamp: 'Mon, 23 Jan 2023 07:20:10 -0000',
-    //   SequenceNumber: '0'
-    // }
     const { CallSid, From, To, CallStatus, CallDuration, Timestamp } = payload;
     const data = {
       from: From,
       to: To,
       status: CallStatus === "completed" ? "success" : "fail",
       duration: CallDuration,
+      message: "call  completed",
       timestamp: Date.parse(Timestamp),
       type: "call",
       serviceInfo: {
@@ -132,33 +122,33 @@ module.exports = class extends AbstractController {
       },
     };
 
-    console.log("data", { data, payload });
+    console.log("data", data);
 
-    const call = await this.table.findOne({
-      where: {
-        serviceInfo: {
-          [Op.contains]: {
-            sid: data.serviceInfo.sid,
-          },
-        },
-      },
-    });
+    // const call = await this.table.findOne({
+    //   where: {
+    //     serviceInfo: {
+    //       [Op.contains]: {
+    //         sid: data.serviceInfo.sid,
+    //       },
+    //     },
+    //   },
+    // });
 
-    if (call) {
-      return this.table.update(
-        { status: data.status, duration: data.duration },
-        {
-          where: {
-            serviceInfo: {
-              [Op.contains]: {
-                sid: data.serviceInfo.sid,
-              },
-            },
-          },
-        }
-      );
-    } else {
-      return this.table.create(data);
-    }
+    // if (call) {
+    //   return this.table.update(
+    //     { status: data.status, duration: data.duration },
+    //     {
+    //       where: {
+    //         serviceInfo: {
+    //           [Op.contains]: {
+    //             sid: data.serviceInfo.sid,
+    //           },
+    //         },
+    //       },
+    //     }
+    //   );
+    // } else {
+    return this.table.create(data);
+    // }
   }
 };

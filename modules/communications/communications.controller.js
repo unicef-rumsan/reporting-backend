@@ -21,6 +21,7 @@ module.exports = class extends AbstractController {
     update: (req) => this.update(req.params.sid, req.payload, req),
     getCommunicationByBeneficiaryId: (req) =>
       this.getCommunicationByBeneficiaryId(req.params.id, req),
+    addCallbackUrl: (req) => this.addCallbackUrl(req.payload, req),
   };
 
   async add(payload, req) {
@@ -71,10 +72,10 @@ module.exports = class extends AbstractController {
         limit: limit || 100,
         offset: start || 0,
         order: [["timestamp", "DESC"]],
+        raw: true,
       },
       projectId
     );
-    list = JSON.parse(JSON.stringify(list));
     // const list = await this.table.findAll({});
     return {
       data: list,
@@ -99,5 +100,65 @@ module.exports = class extends AbstractController {
   async getCommunicationByBeneficiaryId(id, req) {
     // checkToken(req);
     return this.table.findAll({ where: { beneficiaryId: id } });
+  }
+
+  async addCallbackUrl(payload, req) {
+    // {
+    //   CallSid: '85cab075-01d1-492a-a4ab-482c7401533a',
+    //   AccountSid: '4d741335-4843-44e2-b4f5-8d22cdaa7687',
+    //   From: '+9779801230044',
+    //   To: '+9779801109670',
+    //   CallStatus: 'completed',
+    //   ApiVersion: '2010-04-01',
+    //   Direction: 'outbound-api',
+    //   CallDuration: '15',
+    //   SipResponseCode: '200',
+    //   CallbackSource: 'call-progress-events',
+    //   Timestamp: 'Mon, 23 Jan 2023 07:20:10 -0000',
+    //   SequenceNumber: '0'
+    // }
+    const { CallSid, From, To, CallStatus, CallDuration, Timestamp } = payload;
+    const data = {
+      from: From,
+      to: To,
+      status: CallStatus === "completed" ? "success" : "fail",
+      duration: CallDuration,
+      timestamp: Date.parse(Timestamp),
+      type: "call",
+      serviceInfo: {
+        sid: CallSid,
+        service: "somleng",
+        sipResponseCode: payload.SipResponseCode,
+      },
+    };
+
+    console.log("data", { data, payload });
+
+    const call = await this.table.findOne({
+      where: {
+        serviceInfo: {
+          [Op.contains]: {
+            sid: data.serviceInfo.sid,
+          },
+        },
+      },
+    });
+
+    if (call) {
+      return this.table.update(
+        { status: data.status, duration: data.duration },
+        {
+          where: {
+            serviceInfo: {
+              [Op.contains]: {
+                sid: data.serviceInfo.sid,
+              },
+            },
+          },
+        }
+      );
+    } else {
+      return this.table.create(data);
+    }
   }
 };

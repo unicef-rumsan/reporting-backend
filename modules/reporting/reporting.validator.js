@@ -23,6 +23,14 @@ const validators = {
     }),
   },
 
+  // Ward Wise
+
+  getWardClaimDistributionByKey: {
+    query: Joi.object({
+      ward: Joi.string(),
+      filterKey: Joi.string().required(),
+    }),
+  },
   //#region Demographic Reports
 
   getLandOwnerDemographicData: {

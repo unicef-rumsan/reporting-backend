@@ -42,5 +42,10 @@ module.exports = class extends AbstractRouter {
       path: "/beneficiary/{id}",
       description: "Get communications by beneficiary id",
     },
+    addCallbackUrl: {
+      method: "POST",
+      path: "/callback",
+      description: "Add call webhook",
+    },
   };
 };

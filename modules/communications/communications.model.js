@@ -22,12 +22,25 @@ const schema = {
   },
   message: {
     type: Sequelize.STRING,
-    allowNull: false,
+  },
+  duration: {
+    type: Sequelize.INTEGER,
+    defaultValue: 0,
+  },
+  serviceInfo: {
+    type: Sequelize.JSONB,
+    get() {
+      return JSON.parse(this.getDataValue("serviceInfo"));
+    },
+    set(v) {
+      if (!(v.hasOwnProperty("sid") && v.hasOwnProperty("service")))
+        throw new Error("Must send sid and service. ");
+      return this.setDataValue("serviceInfo", JSON.stringify(v));
+    },
   },
   beneficiaryId: Sequelize.STRING,
   from: Sequelize.STRING,
   hangupCause: Sequelize.STRING,
-  duration: Sequelize.INTEGER,
   billDuration: Sequelize.INTEGER,
 };
 

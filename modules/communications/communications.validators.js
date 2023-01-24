@@ -2,14 +2,6 @@ const Joi = require("joi");
 const { AbstractValidator } = require("@rumsan/core/abstract");
 
 const validators = {
-  updateUsingPhone: {
-    params: Joi.object({
-      phone: Joi.string().required().example("+977158675309"),
-    }),
-    payload: Joi.object({
-      beneficiaryId: Joi.string().required().example("1"),
-    }),
-  },
   addCallbackUrl: {
     payload: Joi.object({
       CallSid: Joi.string().required().example("CA1234567890ABCDE"),

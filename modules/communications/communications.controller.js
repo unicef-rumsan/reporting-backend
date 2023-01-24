@@ -97,7 +97,11 @@ module.exports = class extends AbstractController {
 
   async update(id, payload, req) {
     // checkToken(req);
-    return this.table.update(payload, { where: { id }, returning: true, raw: true });
+    return this.table.update(payload, {
+      where: { id },
+      returning: true,
+      raw: true,
+    });
   }
 
   async getCommunicationByBeneficiaryId(id, req) {
@@ -126,6 +130,8 @@ module.exports = class extends AbstractController {
         sipResponseCode: payload.SipResponseCode,
       },
     };
+
+    // console.log("data", data);
 
     if (beneficiary) {
       data.beneficiaryId = beneficiary.id;

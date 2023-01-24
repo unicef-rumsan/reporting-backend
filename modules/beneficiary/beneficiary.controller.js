@@ -58,13 +58,17 @@ module.exports = class extends AbstractController {
   }
 
   async list(query, projectId) {
-    const { limit, start, cashReceived, ...restQuery } = query;
+    const { limit, start, cashReceived, ward, ...restQuery } = query;
+
+    const searchQuery = {};
 
     // checkToken(req);
     let { rows: list, count } = await finderByProjectId(
       this.table,
       {
-        where: searchObjectKeys(restQuery),
+        where: ward
+          ? { ward, ...searchObjectKeys(restQuery) }
+          : searchObjectKeys(restQuery),
         limit: limit || 100,
         offset: start || 0,
       },

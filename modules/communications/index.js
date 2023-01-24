@@ -1,4 +1,4 @@
-// const Validator = require("./communications.validators");
+const Validator = require("./communications.validators");
 const Controller = require("./communications.controller");
 const { AbstractRouter } = require("@rumsan/core/abstract");
 
@@ -7,7 +7,7 @@ module.exports = class extends AbstractRouter {
     options.name = options.name || "communications";
     options.listeners = {};
     options.controller = new Controller(options);
-    // options.validator = new Validator(options);
+    options.validator = new Validator(options);
     super(options);
   }
   routes = {
@@ -37,6 +37,12 @@ module.exports = class extends AbstractRouter {
       path: "/{sid}",
       description: "Update communications by sid",
     },
+    updateUsingPhone: {
+      method: "PUT",
+      path: "/phone/{phone}",
+      description: "Update communications by phone",
+    },
+
     getCommunicationByBeneficiaryId: {
       method: "GET",
       path: "/beneficiary/{id}",

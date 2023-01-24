@@ -22,6 +22,8 @@ module.exports = class extends AbstractController {
     getCommunicationByBeneficiaryId: (req) =>
       this.getCommunicationByBeneficiaryId(req.params.id, req),
     addCallbackUrl: (req) => this.addCallbackUrl(req.payload, req),
+    updateUsingPhone: (req) =>
+      this.updateUsingPhone(req.params.phone, req.payload, req),
   };
 
   async add(payload, req) {
@@ -95,9 +97,20 @@ module.exports = class extends AbstractController {
   }
 
   async update(sid, payload, req) {
-    console.log("sid", sid);
     // checkToken(req);
     return this.table.update(payload, { where: { sid } });
+  }
+
+  async updateUsingPhone(phone, payload, req) {
+    const up = await this.table.update(payload, {
+      where: {
+        to: phone,
+      },
+      returning: true,
+      raw: true,
+    });
+
+    return up[1][0];
   }
 
   async getCommunicationByBeneficiaryId(id, req) {
@@ -107,6 +120,11 @@ module.exports = class extends AbstractController {
 
   async addCallbackUrl(payload, req) {
     const { CallSid, From, To, CallStatus, CallDuration, Timestamp } = payload;
+
+    const beneficiary = await this.tblBeneficiaries.findOne({
+      where: { phone: To.replace("+977", "") },
+    });
+
     const data = {
       from: From,
       to: To,
@@ -122,33 +140,14 @@ module.exports = class extends AbstractController {
       },
     };
 
+    if (beneficiary) {
+      data.beneficiaryId = beneficiary.id;
+    } else {
+      data.beneficiaryId = null;
+    }
+
     console.log("data", data);
 
-    // const call = await this.table.findOne({
-    //   where: {
-    //     serviceInfo: {
-    //       [Op.contains]: {
-    //         sid: data.serviceInfo.sid,
-    //       },
-    //     },
-    //   },
-    // });
-
-    // if (call) {
-    //   return this.table.update(
-    //     { status: data.status, duration: data.duration },
-    //     {
-    //       where: {
-    //         serviceInfo: {
-    //           [Op.contains]: {
-    //             sid: data.serviceInfo.sid,
-    //           },
-    //         },
-    //       },
-    //     }
-    //   );
-    // } else {
     return this.table.create(data);
-    // }
   }
 };

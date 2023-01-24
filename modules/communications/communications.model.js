@@ -29,9 +29,9 @@ const schema = {
   },
   serviceInfo: {
     type: Sequelize.JSONB,
-    get() {
-      return JSON.parse(this.getDataValue("serviceInfo"));
-    },
+    // get() {
+    //   return JSON.parse(this.getDataValue("serviceInfo"));
+    // },
     set(v) {
       if (!(v.hasOwnProperty("sid") && v.hasOwnProperty("service")))
         throw new Error("Must send sid and service. ");

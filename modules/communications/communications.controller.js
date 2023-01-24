@@ -1,5 +1,6 @@
 const { AbstractController } = require("@rumsan/core/abstract");
 const { Op } = require("sequelize");
+const moment = require("moment");
 const checkToken = require("../../helpers/utils/checkToken");
 const { finderByProjectId } = require("../../helpers/utils/projectFinder");
 const { searchObjectKeys } = require("../../helpers/utils/searchFunctions");
@@ -18,12 +19,10 @@ module.exports = class extends AbstractController {
     list: (req) => this.list(req.query, req.headers.projectId),
     getById: (req) => this.getById(req.params.id, req),
     bulkAdd: (req) => this.bulkAdd(req.payload, req),
-    update: (req) => this.update(req.params.sid, req.payload, req),
+    update: (req) => this.update(req.params.id, req.payload, req),
     getCommunicationByBeneficiaryId: (req) =>
       this.getCommunicationByBeneficiaryId(req.params.id, req),
     addCallbackUrl: (req) => this.addCallbackUrl(req.payload, req),
-    updateUsingPhone: (req) =>
-      this.updateUsingPhone(req.params.phone, req.payload, req),
   };
 
   async add(payload, req) {
@@ -96,21 +95,9 @@ module.exports = class extends AbstractController {
     return this.table.findByPk(id);
   }
 
-  async update(sid, payload, req) {
+  async update(id, payload, req) {
     // checkToken(req);
-    return this.table.update(payload, { where: { sid } });
-  }
-
-  async updateUsingPhone(phone, payload, req) {
-    const up = await this.table.update(payload, {
-      where: {
-        to: phone,
-      },
-      returning: true,
-      raw: true,
-    });
-
-    return up[1][0];
+    return this.table.update(payload, { where: { id }, returning: true, raw: true });
   }
 
   async getCommunicationByBeneficiaryId(id, req) {
@@ -131,7 +118,7 @@ module.exports = class extends AbstractController {
       status: CallStatus === "completed" ? "success" : "fail",
       duration: CallDuration,
       message: "call  completed",
-      timestamp: Date.parse(Timestamp),
+      timestamp: moment(Timestamp).unix(),
       type: "call",
       serviceInfo: {
         sid: CallSid,

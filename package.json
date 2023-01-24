@@ -61,6 +61,7 @@
     "hapi-swagger-static": "^2.0.13",
     "joi": "^17.6.0",
     "jsonwebtoken": "^8.5.1",
+    "moment": "^2.29.4",
     "nodemailer": "^6.7.8",
     "pg": "^8.8.0",
     "pg-hstore": "^2.3.4",

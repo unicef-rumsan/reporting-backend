@@ -1,18 +1,7 @@
 const Joi = require("joi");
 const { AbstractValidator } = require("@rumsan/core/abstract");
 
-const validators = {
-  addCallbackUrl: {
-    payload: Joi.object({
-      CallSid: Joi.string().required().example("CA1234567890ABCDE"),
-      From: Joi.string().required().example("+977158675309"),
-      To: Joi.string().required().example("+977158675309"),
-      CallStatus: Joi.string().example("completed"),
-      CallDuration: Joi.string().required().example(2),
-      Timestamp: Joi.string().required().example("2020-10-10T10:10:10Z"),
-    }),
-  },
-};
+const validators = {};
 
 module.exports = class extends AbstractValidator {
   validators = validators;

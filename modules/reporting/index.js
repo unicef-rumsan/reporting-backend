@@ -103,6 +103,11 @@ module.exports = class extends AbstractRouter {
       description: "Get Land Owner Demographic Data",
     },
 
+    getDistributionSummary: {
+      method: "GET",
+      path: "/summary/distribution",
+    },
+
     // #endregion
   };
 };

@@ -5,6 +5,10 @@ const checkToken = require("../../helpers/utils/checkToken");
 const { finderByProjectId } = require("../../helpers/utils/projectFinder");
 const { searchObjectKeys } = require("../../helpers/utils/searchFunctions");
 const { CommunicationsModel, BeneficiaryModel } = require("../models");
+const {
+  // findMatchingObjects,
+  findMatchingObject,
+} = require("../../helpers/utils/array");
 
 module.exports = class extends AbstractController {
   constructor(options) {
@@ -53,11 +57,25 @@ module.exports = class extends AbstractController {
   }
 
   async list(query, projectId) {
-    const { limit, start, status, showall, ...restQuery } = query;
+    const {
+      limit,
+      start,
+      status,
+      showall,
+      hasBank,
+      ward,
+      type,
+      phone,
+      ...restQuery
+    } = query;
     let customFilters = {};
 
     if (status) {
       customFilters.status = status;
+    }
+
+    if (type) {
+      customFilters.type = type;
     }
 
     if (!showall) {
@@ -80,6 +98,41 @@ module.exports = class extends AbstractController {
       },
       projectId
     );
+
+    if (hasBank !== undefined || ward) {
+      const beneficiaryIds = list.map((item) => item.beneficiaryId);
+
+      const beneficiaries = await this.tblBeneficiaries.findAll({
+        where: {
+          id: { [Op.in]: beneficiaryIds },
+        },
+        raw: true,
+      });
+
+      if (hasBank !== undefined) {
+        list = list.filter((item) => {
+          const beneficiary = beneficiaries?.find(
+            (ben) => ben.id === item?.beneficiaryId
+          );
+          if (!beneficiary) return false;
+          return beneficiary.hasBank === JSON.parse(hasBank);
+        });
+      }
+
+      if (ward) {
+        // find all the items in the list with the same ward
+        list = list.filter((item) => {
+          const beneficiary = beneficiaries?.find(
+            (ben) => ben.id === item?.beneficiaryId
+          );
+          if (!beneficiary) return false;
+          return beneficiary.ward === ward;
+        });
+      }
+    }
+
+    // js function to filter out the list from the object of diffret keys
+
     // const list = await this.table.findAll({});
     return {
       data: list,
@@ -87,6 +140,15 @@ module.exports = class extends AbstractController {
       limit,
       start,
       totalPage: Math.ceil(count / limit),
+      filter: {
+        status,
+        type,
+        ward,
+        hasBank,
+        phone,
+
+        ...restQuery,
+      },
     };
   }
 

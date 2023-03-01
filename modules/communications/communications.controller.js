@@ -100,12 +100,12 @@ module.exports = class extends AbstractController {
     );
 
     if (hasBank !== undefined || ward) {
-      const beneficiaryIds = list.map((item) => item.beneficiaryId);
+      // const beneficiaryIds = list.map((item) => item.beneficiaryId);
 
       const beneficiaries = await this.tblBeneficiaries.findAll({
-        where: {
-          id: { [Op.in]: beneficiaryIds },
-        },
+        // where: {
+        //   id: { [Op.in]: beneficiaryIds },
+        // },
         raw: true,
       });
 

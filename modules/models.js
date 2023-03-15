@@ -5,6 +5,7 @@ const VendorModel = require("./vendor/vendor.model");
 const IssuedTokensModel = require("./issued-tokens/issued-tokens.model");
 const MiscModel = require("./misc/misc.model");
 const CommunicationsModel = require("./communications/communications.model");
+const JaleshworCommunicationModel = require("./communications/jaleshwor-communications.model");
 
 let modelFactory = {
   TransactionClaimERCCacheModel: new TransactionClaimERCCacheModel().init(),
@@ -15,6 +16,7 @@ let modelFactory = {
   IssuedTokensModel: new IssuedTokensModel().init(),
   MiscModel: new MiscModel().init(),
   CommunicationsModel: new CommunicationsModel().init(),
+  JaleshworCommunicationModel: new JaleshworCommunicationModel().init(),
 };
 
 /**********************************************************

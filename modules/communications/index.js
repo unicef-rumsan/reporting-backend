@@ -47,5 +47,15 @@ module.exports = class extends AbstractRouter {
       path: "/callback",
       description: "Add call webhook",
     },
+    getJswCommList: {
+      method: "GET",
+      path: "/jsw",
+      description: "Get jaleshwor communications list",
+    },
+    addJlsComm: {
+      method: "POST",
+      path: "/jaleshwor",
+      description: "Add jaleshwor communications",
+    },
   };
 };

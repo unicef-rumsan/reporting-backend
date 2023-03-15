@@ -4,7 +4,11 @@ const moment = require("moment");
 const checkToken = require("../../helpers/utils/checkToken");
 const { finderByProjectId } = require("../../helpers/utils/projectFinder");
 const { searchObjectKeys } = require("../../helpers/utils/searchFunctions");
-const { CommunicationsModel, BeneficiaryModel } = require("../models");
+const {
+  CommunicationsModel,
+  BeneficiaryModel,
+  JaleshworCommunicationModel,
+} = require("../models");
 const {
   // findMatchingObjects,
   findMatchingObject,
@@ -16,6 +20,7 @@ module.exports = class extends AbstractController {
     options.listeners = {};
     this.table = CommunicationsModel;
     this.tblBeneficiaries = BeneficiaryModel;
+    this.tblJswCommunications = JaleshworCommunicationModel;
   }
 
   registrations = {
@@ -27,9 +32,11 @@ module.exports = class extends AbstractController {
     getCommunicationByBeneficiaryId: (req) =>
       this.getCommunicationByBeneficiaryId(req.params.id, req),
     addCallbackUrl: (req) => this.addCallbackUrl(req.payload, req),
+    getJswCommList: (req) => this.getJswCommList(req.query),
+    addJlsComm: (req) => this.addJlsComm(req.payload),
   };
 
-  async add(payload, req) {
+  async add(payload) {
     // checkToken(req);
     const beneficiary = await this.tblBeneficiaries.findOne({
       where: { phone: payload.to.replace("+977", "") },
@@ -37,6 +44,23 @@ module.exports = class extends AbstractController {
 
     if (beneficiary) {
       payload.beneficiaryId = beneficiary.id;
+
+      let jaleshworCommunicationData = {};
+
+      jaleshworCommunicationData = {
+        type: payload.type,
+        status: payload.status,
+        duration: payload.duration,
+        timestamp: payload.timestamp,
+        ward: beneficiary.ward,
+        hasBank: beneficiary.hasBank,
+        to: payload.to,
+        from: payload.from,
+      };
+
+      console.log("jal", jaleshworCommunicationData);
+
+      await this.tblJswCommunications.create(jaleshworCommunicationData);
     } else {
       payload.beneficiaryId = null;
     }
@@ -174,9 +198,9 @@ module.exports = class extends AbstractController {
   async addCallbackUrl(payload, req) {
     const { CallSid, From, To, CallStatus, CallDuration, Timestamp } = payload;
 
-    const beneficiary = await this.tblBeneficiaries.findOne({
-      where: { phone: To.replace("+977", "") },
-    });
+    // const beneficiary = await this.tblBeneficiaries.findOne({
+    //   where: { phone: To.replace("+977", "") },
+    // });
 
     const data = {
       from: From,
@@ -193,16 +217,82 @@ module.exports = class extends AbstractController {
       },
     };
 
-    // console.log("data", data);
+    // if (beneficiary) {
+    //   data.beneficiaryId = beneficiary.id;
+    // } else {
+    //   data.beneficiaryId = null;
+    // }
 
-    if (beneficiary) {
-      data.beneficiaryId = beneficiary.id;
-    } else {
-      data.beneficiaryId = null;
-    }
+    return this.add(data);
+  }
 
-    console.log("data", data);
+  async getJswCommList(params) {
+    // console.log("params", params);
+    const { limit, start, ...restQuery } = params;
+    const { rows: data } = await this.tblJswCommunications.findAndCountAll({
+      attributes: [
+        "to",
+        [
+          this.db.Sequelize.fn("COUNT", this.db.Sequelize.col("status")),
+          "numberOfAttempts",
+        ],
+        "status",
+        "timestamp",
+        "hasBank",
+        "ward",
+        "duration",
+        "type",
+      ],
+      where: {
+        ...searchObjectKeys(restQuery),
+        // status: {
+        //   [Op.ne]: "success",
+        // },
+      },
+      limit: limit || 100,
 
-    return this.table.create(data);
+      offset: start || 0,
+      order: [["timestamp", "DESC"]],
+      group: [
+        "to",
+        "status",
+        "timestamp",
+        "hasBank",
+        "ward",
+        "duration",
+        "type",
+      ],
+      raw: true,
+    });
+    return data;
+    // console.log("params", params);
+    // const { limit, start, ...restQuery } = params;
+    // const { rows: list, count } =
+    //   await this.tblJswCommunications.findAndCountAll({
+    //     where: {
+    //       ...searchObjectKeys(restQuery),
+    //     },
+    //     limit: limit || 100,
+
+    //     offset: start || 0,
+    //     order: [["timestamp", "DESC"]],
+    //     raw: true,
+    //   });
+
+    // return {
+    //   data: list,
+    //   count,
+    //   limit: limit || 100,
+    //   start: start || 0,
+    //   totalPage: Math.ceil(count / (limit || 100)),
+    //   filter: {
+    //     ...restQuery,
+    //   },
+    // };
+  }
+
+  async addJlsComm(payload) {
+    const created = await this.tblJswCommunications.create(payload);
+    return created;
   }
 };

@@ -13,17 +13,6 @@ function findMatchingObject(array, obj) {
   });
 }
 
-const array = [
-  { phone: "1234567890", name: "John", ward: 10 },
-  { phone: "8234567890", name: "John", ward: 1 },
-];
-
-const obj = {
-  ward: 10,
-};
-
-console.log(findMatchingObject(array, obj));
-
 module.exports = {
   findMatchingObject,
 };

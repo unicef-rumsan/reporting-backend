@@ -228,43 +228,114 @@ module.exports = class extends AbstractController {
 
   async getJswCommList(params) {
     // console.log("params", params);
-    const { limit, start, ...restQuery } = params;
-    const { rows: data } = await this.tblJswCommunications.findAndCountAll({
-      attributes: [
-        "to",
-        [
-          this.db.Sequelize.fn("COUNT", this.db.Sequelize.col("status")),
-          "numberOfAttempts",
-        ],
-        "status",
-        "timestamp",
-        "hasBank",
-        "ward",
-        "duration",
-        "type",
-      ],
-      where: {
-        ...searchObjectKeys(restQuery),
-        // status: {
-        //   [Op.ne]: "success",
-        // },
-      },
-      limit: limit || 100,
+    const { limit, start, type, ward, ...restQuery } = params;
 
-      offset: start || 0,
-      order: [["timestamp", "DESC"]],
-      group: [
-        "to",
-        "status",
-        "timestamp",
-        "hasBank",
-        "ward",
-        "duration",
-        "type",
-      ],
-      raw: true,
-    });
-    return data;
+    let otherFilters = {};
+
+    if (type) {
+      otherFilters.type = type;
+    }
+
+    if (ward) {
+      otherFilters.ward = ward;
+    }
+
+    let { rows: data, count } = await this.tblJswCommunications.findAndCountAll(
+      {
+        attributes: [
+          "to",
+          [
+            this.db.Sequelize.fn("COUNT", this.db.Sequelize.col("status")),
+            "numberOfAttempts",
+          ],
+          "status",
+          "timestamp",
+          "hasBank",
+          "ward",
+          "duration",
+          "type",
+          "beneficiaryId",
+        ],
+        where: {
+          ...otherFilters,
+          ...searchObjectKeys(restQuery),
+          // status: {d
+          //   [Op.ne]: "success",
+          // },
+        },
+        limit: limit || 100,
+
+        offset: start || 0,
+        order: [["timestamp", "DESC"]],
+        group: [
+          "to",
+          "status",
+          "timestamp",
+          "hasBank",
+          "ward",
+          "duration",
+          "type",
+          "beneficiaryId",
+        ],
+        raw: true,
+      }
+    );
+
+    function transformData(data) {
+      const transformedData = [];
+
+      // group data by 'to' phone number
+      const phoneGroups = data.reduce((groups, item) => {
+        if (!groups[item.to]) {
+          groups[item.to] = [];
+        }
+        groups[item.to].push(item);
+        return groups;
+      }, {});
+
+      // loop through each phone group
+      for (let phoneNumber in phoneGroups) {
+        const phoneData = phoneGroups[phoneNumber];
+
+        // sort phone data by timestamp in descending order
+        phoneData.sort((a, b) => b.timestamp - a.timestamp);
+
+        // calculate number of attempts
+        const numberOfAttempts = phoneData.length;
+
+        // get latest status and timestamp
+        const latestStatus = phoneData[0].status;
+        const latestTimestamp = phoneData[0].timestamp;
+
+        // push transformed data to array
+        transformedData.push({
+          to: phoneNumber,
+          numberOfAttempts: numberOfAttempts,
+          status: latestStatus,
+          timestamp: latestTimestamp,
+          hasBank: phoneData[0].hasBank,
+          ward: phoneData[0].ward,
+          duration: phoneData[0].duration,
+          type: phoneData[0].type,
+          beneficiaryId: phoneData[0].beneficiaryId,
+        });
+      }
+
+      return transformedData;
+    }
+
+    data = transformData(data);
+
+    return {
+      data,
+      count: count?.length,
+      limit: limit || 100,
+      start: start || 0,
+      totalPage: Math.ceil(count / (limit || 100)),
+      filter: {
+        ...restQuery,
+      },
+    };
     // console.log("params", params);
     // const { limit, start, ...restQuery } = params;
     // const { rows: list, count } =

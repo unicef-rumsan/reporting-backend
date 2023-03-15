@@ -49,7 +49,7 @@ module.exports = class extends AbstractRouter {
     },
     getJswCommList: {
       method: "GET",
-      path: "/jsw",
+      path: "/jaleshwor",
       description: "Get jaleshwor communications list",
     },
     addJlsComm: {

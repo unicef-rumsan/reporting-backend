@@ -57,5 +57,10 @@ module.exports = class extends AbstractRouter {
       path: "/jaleshwor",
       description: "Add jaleshwor communications",
     },
+    getJswCommByPhone: {
+      method: "GET",
+      path: "/jaleshwor/{phone}",
+      description: "Get jaleshwor communications by phone",
+    },
   };
 };

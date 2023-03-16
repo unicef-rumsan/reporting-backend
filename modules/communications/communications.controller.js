@@ -34,6 +34,7 @@ module.exports = class extends AbstractController {
     addCallbackUrl: (req) => this.addCallbackUrl(req.payload, req),
     getJswCommList: (req) => this.getJswCommList(req.query),
     addJlsComm: (req) => this.addJlsComm(req.payload),
+    getJswCommByPhone: (req) => this.getJswCommByPhone(req.params.phone),
   };
 
   async add(payload) {
@@ -42,28 +43,30 @@ module.exports = class extends AbstractController {
       where: { phone: payload.to.replace("+977", "") },
     });
 
-    if (beneficiary) {
-      payload.beneficiaryId = beneficiary.id;
+    console.log("payload", payload);
 
-      let jaleshworCommunicationData = {};
+    // if (beneficiary) {
+    payload.beneficiaryId = beneficiary.id;
 
-      jaleshworCommunicationData = {
-        type: payload.type,
-        status: payload.status,
-        duration: payload.duration,
-        timestamp: payload.timestamp,
-        ward: beneficiary.ward,
-        hasBank: beneficiary.hasBank,
-        to: payload.to,
-        from: payload.from,
-      };
+    let jaleshworCommunicationData = {};
 
-      console.log("jal", jaleshworCommunicationData);
+    jaleshworCommunicationData = {
+      type: payload.type,
+      status: payload.status,
+      duration: payload.duration,
+      timestamp: payload.timestamp,
+      ward: beneficiary.ward,
+      hasBank: beneficiary.hasBank,
+      to: payload.to,
+      from: payload.from,
+    };
 
-      await this.tblJswCommunications.create(jaleshworCommunicationData);
-    } else {
-      payload.beneficiaryId = null;
-    }
+    console.log("jal", jaleshworCommunicationData);
+
+    await this.addJlsComm(payload);
+    // } else {
+    //   payload.beneficiaryId = null;
+    // }
     try {
       return this.table.create(payload);
     } catch (err) {
@@ -228,7 +231,7 @@ module.exports = class extends AbstractController {
 
   async getJswCommList(params) {
     // console.log("params", params);
-    const { limit, start, type, ward, ...restQuery } = params;
+    const { limit, start, type, ward, status, ...restQuery } = params;
 
     let otherFilters = {};
 
@@ -238,6 +241,10 @@ module.exports = class extends AbstractController {
 
     if (ward) {
       otherFilters.ward = ward;
+    }
+
+    if (status) {
+      otherFilters.status = status;
     }
 
     let { rows: data, count } = await this.tblJswCommunications.findAndCountAll(
@@ -263,7 +270,7 @@ module.exports = class extends AbstractController {
           //   [Op.ne]: "success",
           // },
         },
-        limit: limit || 100,
+        limit: limit || 200,
 
         offset: start || 0,
         order: [["timestamp", "DESC"]],
@@ -365,5 +372,12 @@ module.exports = class extends AbstractController {
   async addJlsComm(payload) {
     const created = await this.tblJswCommunications.create(payload);
     return created;
+  }
+
+  async getJswCommByPhone(phone) {
+    return this.tblJswCommunications.findAll({
+      where: { to: phone },
+      order: [["timestamp", "DESC"]],
+    });
   }
 };

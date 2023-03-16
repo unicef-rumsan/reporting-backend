@@ -14,6 +14,12 @@ const validators = {
     }),
   },
 
+  getJswCommByPhone: {
+    params: Joi.object({
+      phone: Joi.string().example("9840000000"),
+    }),
+  },
+
   addCallbackUrl: {
     payload: Joi.object({
       CallSid: Joi.string().example("9865-4565"),

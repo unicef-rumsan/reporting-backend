@@ -374,9 +374,9 @@ module.exports = class extends AbstractController {
     return created;
   }
 
-  async getJswCommByPhone(phone) {
+  async getJswCommByPhone(to) {
     return this.tblJswCommunications.findAll({
-      where: { to: phone },
+      where: { to },
       order: [["timestamp", "DESC"]],
     });
   }

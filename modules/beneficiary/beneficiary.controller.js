@@ -165,7 +165,7 @@ module.exports = class extends AbstractController {
     let { rows, count } = await finderByProjectId(
       this.table,
       {
-        where: { ward },
+        where: { ward, isClaimed: true },
         raw: true,
       },
       projectId
@@ -175,25 +175,31 @@ module.exports = class extends AbstractController {
 
     const beneficiaryPhones = rows.map((b) => b.phone);
 
-    const transactions = await this.tblClaimTransactions.findAll({
-      where: {
-        beneficiary: {
-          [Op.in]: beneficiaryPhones,
-        },
-      },
-      // attributes: ["name", "phone"],
-      raw: true,
-    });
+    // const transactions = await this.tblClaimTransactions.findAll({
+    //   where: {
+    //     beneficiary: {
+    //       [Op.in]: beneficiaryPhones,
+    //     },
+    //   },
+    //   // attributes: ["name", "phone"],
+    //   raw: true,
+    // });
 
-    const beneficiaryMapped = await this._replaceWithBeneficiaryName(
-      transactions
-    );
-    const remainingBeneficiaries = rows.filter(
-      (b) => !transactions.find((t) => t.beneficiary === b.phone)
-    );
+    const ben = rows.map((r) => {
+      // const tr = transactions.find((d) => d.beneficiary === r.phone);
+      return {
+        ...r,
+        // ...tr,
+      };
+    });
+    // const remainingBeneficiaries = rows.filter(
+    //   (b) => !transactions.find((t) => t.beneficiary === b.phone)
+    // );
+
+    const remainingBeneficiaries = rows?.filter((b) => !b.isClaimed);
 
     return {
-      data: beneficiaryMapped,
+      data: ben,
       count,
       numOfBenefRemainingToClaim: remainingBeneficiaries.length,
     };

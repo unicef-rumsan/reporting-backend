@@ -185,23 +185,34 @@ module.exports = class extends AbstractController {
     //   raw: true,
     // });
 
-    const ben = rows.map((r) => {
-      // const tr = transactions.find((d) => d.beneficiary === r.phone);
-      return {
-        ...r,
-        // ...tr,
-      };
-    });
+    const claimedBen = rows.filter((r) => r.isClaimed);
+
+    // const ben = rows.map((r) => {
+    //   // const tr = transactions.find((d) => d.beneficiary === r.phone);
+    //   return {
+    //     ...r,
+    //     // ...tr,
+    //   };
+    // });
     // const remainingBeneficiaries = rows.filter(
     //   (b) => !transactions.find((t) => t.beneficiary === b.phone)
     // );
 
-    const remainingBeneficiaries = rows?.filter((b) => !b.isClaimed);
+    let { rows: remainingBen } = await finderByProjectId(
+      this.table,
+      {
+        where: { ward, isClaimed: false },
+        raw: true,
+      },
+      projectId
+    );
+
+    // const remainingBeneficiaries = rows?.filter((b) => !b.isClaimed);
 
     return {
-      data: ben,
+      data: claimedBen,
       count,
-      numOfBenefRemainingToClaim: remainingBeneficiaries.length,
+      numOfBenefRemainingToClaim: remainingBen.length,
     };
   }
 };

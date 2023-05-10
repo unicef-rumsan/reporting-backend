@@ -39,9 +39,13 @@ module.exports = class extends AbstractController {
 
   async add(payload) {
     // checkToken(req);
+    const toNumber = payload.to.includes("+977")
+      ? payload.to.replace("+977", "")
+      : payload.to;
+
     const beneficiary = await this.tblBeneficiaries.findOne({
       where: {
-        phone: payload.to.replace("+977", ""),
+        phone: toNumber,
       },
     });
 

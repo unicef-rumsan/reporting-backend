@@ -65,6 +65,7 @@ module.exports = class extends AbstractController {
         hasBank: beneficiary.hasBank,
         to: payload.to,
         from: payload.from,
+        beneficiaryId: payload.beneficiaryId,
       };
 
       console.log("jal", jaleshworCommunicationData);

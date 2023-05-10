@@ -47,28 +47,28 @@ module.exports = class extends AbstractController {
 
     console.log("payload", payload);
 
-    // if (beneficiary) {
-    payload.beneficiaryId = beneficiary.id;
+    if (beneficiary) {
+      payload.beneficiaryId = beneficiary.id;
 
-    let jaleshworCommunicationData = {};
+      let jaleshworCommunicationData = {};
 
-    jaleshworCommunicationData = {
-      type: payload.type,
-      status: payload.status,
-      duration: payload.duration,
-      timestamp: payload.timestamp,
-      ward: beneficiary.ward,
-      hasBank: beneficiary.hasBank,
-      to: payload.to,
-      from: payload.from,
-    };
+      jaleshworCommunicationData = {
+        type: payload.type,
+        status: payload.status,
+        duration: payload.duration,
+        timestamp: payload.timestamp,
+        ward: beneficiary.ward,
+        hasBank: beneficiary.hasBank,
+        to: payload.to,
+        from: payload.from,
+      };
 
-    console.log("jal", jaleshworCommunicationData);
+      console.log("jal", jaleshworCommunicationData);
 
-    await this.addJlsComm(jaleshworCommunicationData);
-    // } else {
-    //   payload.beneficiaryId = null;
-    // }
+      await this.addJlsComm(jaleshworCommunicationData);
+    } else {
+      payload.beneficiaryId = null;
+    }
     try {
       return this.table.create(payload);
     } catch (err) {

@@ -40,7 +40,9 @@ module.exports = class extends AbstractController {
   async add(payload) {
     // checkToken(req);
     const beneficiary = await this.tblBeneficiaries.findOne({
-      where: { phone: payload.to.replace("+977", "") },
+      where: {
+        phone: payload.to.replace("+977", ""),
+      },
     });
 
     console.log("payload", payload);
@@ -63,7 +65,7 @@ module.exports = class extends AbstractController {
 
     console.log("jal", jaleshworCommunicationData);
 
-    await this.addJlsComm(payload);
+    await this.addJlsComm(jaleshworCommunicationData);
     // } else {
     //   payload.beneficiaryId = null;
     // }

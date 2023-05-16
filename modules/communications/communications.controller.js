@@ -392,6 +392,24 @@ module.exports = class extends AbstractController {
           this.db.Sequelize.fn(
             "SUM",
             this.db.Sequelize.literal(
+              "CASE WHEN type = 'call' THEN 1 ELSE 0 END"
+            )
+          ),
+          "totalCalls",
+        ],
+        [
+          this.db.Sequelize.fn(
+            "SUM",
+            this.db.Sequelize.literal(
+              "CASE WHEN type = 'sms' THEN 1 ELSE 0 END"
+            )
+          ),
+          "totalSMS",
+        ],
+        [
+          this.db.Sequelize.fn(
+            "SUM",
+            this.db.Sequelize.literal(
               "CASE WHEN type = 'call' AND 'status' = 'success' THEN 1 ELSE 0 END"
             )
           ),

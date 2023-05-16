@@ -262,6 +262,7 @@ module.exports = class extends AbstractController {
             this.db.Sequelize.fn("COUNT", this.db.Sequelize.col("status")),
             "numberOfAttempts",
           ],
+
           "status",
           "timestamp",
           "hasBank",
@@ -338,6 +339,103 @@ module.exports = class extends AbstractController {
       return transformedData;
     }
 
+    let { rows: allSummary } = await this.tblJswCommunications.findAndCountAll({
+      raw: true,
+
+      attributes: [
+        [
+          this.db.Sequelize.fn(
+            "SUM",
+            this.db.Sequelize.literal(
+              "CASE WHEN type = 'sms' AND 'hasBank' = 'true' THEN 1 ELSE 0 END"
+            )
+          ),
+          "totalSMSWithBank",
+        ],
+        [
+          this.db.Sequelize.fn(
+            "SUM",
+            this.db.Sequelize.literal(
+              "CASE WHEN type = 'sms' AND 'hasBank' = 'false' THEN 1 ELSE 0 END"
+            )
+          ),
+          "totalSMSWithoutBank",
+        ],
+        [
+          this.db.Sequelize.fn(
+            "SUM",
+            this.db.Sequelize.literal(
+              "CASE WHEN type = 'call' AND 'hasBank' = 'true' THEN 1 ELSE 0 END"
+            )
+          ),
+          "totalCallsWithBank",
+        ],
+        [
+          this.db.Sequelize.fn(
+            "SUM",
+            this.db.Sequelize.literal(
+              "CASE WHEN type = 'call' AND 'hasBank' = 'false' THEN 1 ELSE 0 END"
+            )
+          ),
+          "totalCallsWithoutBank",
+        ],
+        [
+          this.db.Sequelize.fn(
+            "SUM",
+            this.db.Sequelize.literal(
+              "CASE WHEN type = 'call' AND (status = 'fail' OR status = 'busy' OR status = 'unanswered') THEN 1 ELSE 0 END"
+            )
+          ),
+          "totalFailedCalls",
+        ],
+        [
+          this.db.Sequelize.fn(
+            "SUM",
+            this.db.Sequelize.literal(
+              "CASE WHEN type = 'call' AND 'status' = 'success' THEN 1 ELSE 0 END"
+            )
+          ),
+          "totalSuccessCalls",
+        ],
+        [
+          this.db.Sequelize.fn(
+            "SUM",
+            this.db.Sequelize.literal(
+              "CASE WHEN type = 'sms' AND (status = 'fail' OR status = 'busy' OR status = 'unanswered') THEN 1 ELSE 0 END"
+            )
+          ),
+          "totalFailedSMS",
+        ],
+        [
+          this.db.Sequelize.fn(
+            "SUM",
+            this.db.Sequelize.literal(
+              "CASE WHEN type = 'sms' AND 'status' = 'success' THEN 1 ELSE 0 END"
+            )
+          ),
+          "totalSuccessSMS",
+        ],
+        [
+          this.db.Sequelize.fn(
+            "SUM",
+            this.db.Sequelize.literal(
+              "CASE WHEN status = 'fail' THEN 1 ELSE 0 END"
+            )
+          ),
+          "totalFailed",
+        ],
+        [
+          this.db.Sequelize.fn(
+            "SUM",
+            this.db.Sequelize.literal(
+              "CASE WHEN status = 'success' THEN 1 ELSE 0 END"
+            )
+          ),
+          "totalSuccess",
+        ],
+      ],
+    });
+
     data = transformData(data);
 
     return {
@@ -345,6 +443,7 @@ module.exports = class extends AbstractController {
       count: count?.length,
       limit: limit || 100,
       start: start || 0,
+      summary: allSummary[0],
       totalPage: Math.ceil(count / (limit || 100)),
       filter: {
         ...restQuery,
